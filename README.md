@@ -10,7 +10,7 @@ Next.js 15 · Supabase · Vercel. Kontext für Claude Code steht in `CLAUDE.md`.
 1. **SQL Editor** → Inhalt von `supabase/migrations/20261107000000_init.sql` einfügen → Run.
 2. **Authentication → URL Configuration**
    - Site URL: `https://cockpit.saxer.sg`
-   - Redirect URLs: `https://cockpit.saxer.sg/auth/callback`, `http://localhost:3000/auth/callback`
+   - Redirect URLs: `https://cockpit.saxer.sg/**`, `https://*.vercel.app/**`, `http://localhost:3000/**`
 3. **Project Settings → API**: Project URL und `anon` Key kopieren.
 
 ### 2. Vercel
@@ -27,11 +27,16 @@ Next.js 15 · Supabase · Vercel. Kontext für Claude Code steht in `CLAUDE.md`.
 Websites & Domains → saxer.sg → **DNS-Einstellungen** → Eintrag hinzufügen:
 - Typ `CNAME`, Name `cockpit`, Wert: der von Vercel angezeigte Wert (meist `cname.vercel-dns.com.`)
 
-### 4. Erster Login
-1. https://cockpit.saxer.sg öffnen, Login-Link anfordern, Link auf demselben Gerät öffnen.
-2. Bereiche und Typen werden beim ersten Login automatisch angelegt.
-3. Danach in Supabase **Authentication → Providers → Email → „Allow new users to sign up“ ausschalten**.
+### 4. Benutzer anlegen und erster Login
+1. Supabase → **Authentication → Users → Add user → Create new user**:
+   E-Mail (= `ALLOWED_EMAIL`), sicheres Passwort, **Auto Confirm User** anhaken.
+2. Supabase → **Authentication → Sign In / Providers**: „Allow new users to sign up“ **ausschalten**.
    So kann niemand sonst ein Konto anlegen.
+3. Cockpit öffnen und mit E-Mail und Passwort anmelden.
+   Bereiche und Typen werden beim ersten Login automatisch angelegt.
+
+Der Login-Link per E-Mail ist nur eine Alternative. Er muss im selben Browser geöffnet werden,
+und Supabase verschickt ohne eigenen Mailserver nur wenige Mails pro Stunde.
 
 ### 5. Als App installieren
 - iPhone/iPad: Safari → Teilen → „Zum Home-Bildschirm“.

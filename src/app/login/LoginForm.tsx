@@ -3,24 +3,42 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
+type State = "idle" | "busy" | "sent" | "error";
+
 export function LoginForm({ microsoft }: { microsoft: boolean }) {
   const [email, setEmail] = useState("");
-  const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [password, setPassword] = useState("");
+  const [mode, setMode] = useState<"password" | "link">("password");
+  const [state, setState] = useState<State>("idle");
   const [message, setMessage] = useState("");
 
   const redirectTo = () => `${window.location.origin}/auth/callback`;
 
-  async function sendLink(e: React.FormEvent) {
+  function fail(msg: string) {
+    setState("error");
+    setMessage(
+      msg.includes("Invalid login credentials")
+        ? "E-Mail oder Passwort falsch."
+        : msg.toLowerCase().includes("rate limit")
+          ? "Zu viele Versuche. Bitte später erneut oder mit Passwort anmelden."
+          : msg,
+    );
+  }
+
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    setState("sending");
-    const { error } = await createClient().auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: redirectTo() },
-    });
-    if (error) {
-      setState("error");
-      setMessage(error.message);
+    setState("busy");
+    const supabase = createClient();
+    if (mode === "password") {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) return fail(error.message);
+      window.location.href = "/";
     } else {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: redirectTo(), shouldCreateUser: false },
+      });
+      if (error) return fail(error.message);
       setState("sent");
     }
   }
@@ -37,7 +55,7 @@ export function LoginForm({ microsoft }: { microsoft: boolean }) {
       <p className="mt-6 text-center font-mono text-sm text-green glow-green">
         CLEARED · Link unterwegs.
         <br />
-        <span className="text-xs text-dim">Prüfe dein Postfach und öffne den Link auf diesem Gerät.</span>
+        <span className="text-xs text-dim">Öffne den Link im selben Browser, in dem du ihn angefordert hast.</span>
       </p>
     );
   }
@@ -52,7 +70,7 @@ export function LoginForm({ microsoft }: { microsoft: boolean }) {
           <div className="label text-center">oder</div>
         </>
       )}
-      <form onSubmit={sendLink} className="space-y-3">
+      <form onSubmit={submit} className="space-y-3">
         <input
           type="email"
           required
@@ -62,11 +80,32 @@ export function LoginForm({ microsoft }: { microsoft: boolean }) {
           placeholder="E-Mail"
           className="field"
         />
-        <button type="submit" disabled={state === "sending"} className="btn btn-primary w-full disabled:opacity-60">
-          {state === "sending" ? "Sende…" : "Login-Link senden"}
+        {mode === "password" && (
+          <input
+            type="password"
+            required
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Passwort"
+            className="field"
+          />
+        )}
+        <button type="submit" disabled={state === "busy"} className="btn btn-primary w-full disabled:opacity-60">
+          {state === "busy" ? "Prüfe…" : mode === "password" ? "Anmelden" : "Login-Link senden"}
         </button>
       </form>
       {state === "error" && <p className="font-mono text-xs text-red">{message}</p>}
+      <button
+        type="button"
+        onClick={() => {
+          setMode(mode === "password" ? "link" : "password");
+          setState("idle");
+        }}
+        className="label block w-full text-center text-cyan"
+      >
+        {mode === "password" ? "Stattdessen Login-Link per E-Mail" : "Mit Passwort anmelden"}
+      </button>
     </div>
   );
 }
