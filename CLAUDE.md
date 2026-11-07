@@ -44,9 +44,9 @@ Bühler, Studium (ZHAW SML), IPA (Prüfungsexperte), SR-Verantwortlicher FC Zuzw
   Fixe Fristen werden nicht verschoben, sondern markiert.
 - **IPA:** Aus Kürzel, Start und Ende werden Fixpunkte erzeugt: Validierungsgespräch (ca. 2 Arbeitstage vor Start),
   Besuch 1 (2. Arbeitstag), Besuch 2 (Mitte), Abgabe (Ende), Korrektur, Präsentation (ca. 3 Wochen nach Abgabe).
-  Alle Fixpunkte sind einzeln verschiebbar.
-- **SR-Kontingent:** Pro Vereins-SR und Kalenderjahr gilt ein Ziel von 15 Spielen. Wird es erreicht,
-  darf der Verein in der folgenden Saison 2 Mannschaften stellen.
+  Alle Fixpunkte sind einzeln verschiebbar. ICT-Fachmann/-frau EFZ: nur Durchführungstag und Validierungsgespräch ca. eine Woche davor.
+- **SR-Kontingent:** Kein Spielzähler. Pro Vereins-SR und Kalenderjahr wird nur markiert, ob das Kontingent
+  (15 Spiele) erreicht ist. Jeder erreichte SR sichert 2 Mannschaften für die folgende Saison.
 - **Projekte:** Statusampel (grün, gelb, rot), nächster Schritt, Meilensteine.
 
 ## Daten- und Sicherheitsregeln

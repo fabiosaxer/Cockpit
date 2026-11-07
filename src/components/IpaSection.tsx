@@ -1,7 +1,9 @@
 import Link from "next/link";
-import { createIpaCandidate, deleteIpaCandidate } from "@/app/actions";
+import { deleteIpaCandidate } from "@/app/actions";
 import { loadIpa } from "@/lib/data";
 import { addDays, formatRange, formatShort } from "@/lib/dates";
+import { PROFESSION_LABEL } from "@/lib/ipa";
+import { IpaForm } from "./IpaForm";
 import { SubmitButton } from "./SubmitButton";
 
 export async function IpaSection({ today }: { today: string }) {
@@ -11,7 +13,7 @@ export async function IpaSection({ today }: { today: string }) {
   } catch {
     return (
       <section className="instrument p-4 text-sm">
-        Für die IPA-Vorlage fehlt noch die zweite Datenbank-Migration (siehe README).
+        Für die IPA-Vorlage fehlen noch Datenbank-Migrationen (siehe README).
       </section>
     );
   }
@@ -31,6 +33,7 @@ export async function IpaSection({ today }: { today: string }) {
                 <span className="text-lg font-black">IPA {c.code}</span>
                 <span className="text-sm text-dim">{formatRange(c.start_date, c.end_date)}</span>
               </div>
+              <div className="px-1 text-xs text-dim">{PROFESSION_LABEL[c.profession ?? "informatiker"]}</div>
               <ol className="mt-3 space-y-1.5">
                 {pts.map((p) => {
                   const done = !!p.done_at;
@@ -67,33 +70,7 @@ export async function IpaSection({ today }: { today: string }) {
 
       <details className="instrument p-4" open={active.length === 0}>
         <summary className="cursor-pointer px-1 text-sm font-bold text-cyan">+ IPA-Kandidat hinzufügen</summary>
-        <form action={createIpaCandidate} className="mt-3 space-y-3">
-          <label className="block space-y-1">
-            <span className="label">Kürzel (keine vollen Namen)</span>
-            <input name="code" required maxLength={8} placeholder="z.B. AB" className="field uppercase" />
-          </label>
-          <div className="grid grid-cols-2 gap-3">
-            <label className="block space-y-1">
-              <span className="label">Start IPA</span>
-              <input type="date" name="start_date" required className="field" />
-            </label>
-            <label className="block space-y-1">
-              <span className="label">Ende / Abgabe</span>
-              <input type="date" name="end_date" required className="field" />
-            </label>
-          </div>
-          <label className="block space-y-1">
-            <span className="label">Präsentation (leer = ca. 3 Wochen nach Abgabe)</span>
-            <input type="date" name="presentation_date" className="field" />
-          </label>
-          <SubmitButton className="btn btn-primary w-full" pendingText="Lege an…">
-            Kandidat und Fixpunkte anlegen
-          </SubmitButton>
-          <p className="text-xs text-dim">
-            Angelegt werden: Validierungsgespräch (2 Arbeitstage vor Start), Besuch 1 (2. Tag), Besuch 2 (Mitte), Abgabe,
-            Korrektur & Fachfragen (sichtbar ab Abgabe) und Präsentation. Jeder Fixpunkt lässt sich danach einzeln verschieben.
-          </p>
-        </form>
+        <IpaForm />
       </details>
     </section>
   );

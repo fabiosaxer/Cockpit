@@ -265,13 +265,14 @@ export async function createIpaCandidate(fd: FormData) {
   const code = str(fd, "code").toUpperCase();
   if (!code) throw new Error("Kürzel fehlt");
   const start = date(fd, "start_date");
-  const end = date(fd, "end_date");
+  const profession = str(fd, "profession") === "ict" ? "ict" : "informatiker";
+  const end = profession === "ict" ? start : date(fd, "end_date");
   if (end < start) throw new Error("Ende liegt vor dem Start");
-  const presentation = optDate(fd, "presentation_date");
+  const presentation = profession === "ict" ? null : optDate(fd, "presentation_date");
 
   const { data: cand, error } = await supabase
     .from("ipa_candidates")
-    .insert({ code, start_date: start, end_date: end, presentation_date: presentation })
+    .insert({ code, profession, start_date: start, end_date: end, presentation_date: presentation })
     .select("id")
     .single();
   if (error || !cand) throw new Error(error?.message ?? "Speichern fehlgeschlagen");
@@ -283,7 +284,7 @@ export async function createIpaCandidate(fd: FormData) {
   const areaId = (areas ?? []).find((a) => a.code === "IPA")?.id ?? areas?.[0]?.id;
   const typeId = (name: string) => (types ?? []).find((t) => t.name === name)?.id ?? null;
 
-  const rows = ipaSchedule(code, start, end, presentation).map((p) => ({
+  const rows = ipaSchedule(profession, code, start, end, presentation).map((p) => ({
     area_id: areaId,
     type_id: typeId(p.type),
     ipa_candidate_id: cand.id,
@@ -322,20 +323,12 @@ export async function deleteReferee(id: string) {
   refresh();
 }
 
-export async function addRefereeGame(refereeId: string, fd: FormData) {
+/** Kontingent fuer ein Kalenderjahr als erreicht / nicht erreicht markieren. */
+export async function setRefereeQuota(refereeId: string, year: number, reached: boolean) {
   const { supabase } = await requireSession();
-  const { error } = await supabase.from("referee_games").insert({
-    referee_id: refereeId,
-    game_date: optDate(fd, "game_date") ?? todayISO(),
-    note: optStr(fd, "note"),
-  });
-  if (error) throw new Error(error.message);
-  refresh();
-}
-
-export async function deleteRefereeGame(id: string) {
-  const { supabase } = await requireSession();
-  const { error } = await supabase.from("referee_games").delete().eq("id", id);
+  const { error } = await supabase
+    .from("referee_quota")
+    .upsert({ referee_id: refereeId, year, reached }, { onConflict: "referee_id,year" });
   if (error) throw new Error(error.message);
   refresh();
 }

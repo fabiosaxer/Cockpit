@@ -54,6 +54,7 @@ export type IpaCandidate = {
   start_date: string;
   end_date: string;
   presentation_date: string | null;
+  profession: "informatiker" | "ict";
 };
 
 export type Referee = {
@@ -63,9 +64,9 @@ export type Referee = {
   active: boolean;
 };
 
-export type RefereeGame = {
+export type RefereeQuota = {
   id: string;
   referee_id: string;
-  game_date: string;
-  note: string | null;
+  year: number;
+  reached: boolean;
 };

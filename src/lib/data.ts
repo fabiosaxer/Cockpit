@@ -2,7 +2,7 @@ import "server-only";
 import { redirect } from "next/navigation";
 import { createClient } from "./supabase/server";
 import { addDays, todayISO } from "./dates";
-import type { Absence, Area, IpaCandidate, Item, ItemType, Project, Referee, RefereeGame } from "./types";
+import type { Absence, Area, IpaCandidate, Item, ItemType, Project, Referee, RefereeQuota } from "./types";
 
 const DEFAULT_AREAS = [
   { code: "BUE", name: "Bühler", sort: 10 },
@@ -96,20 +96,15 @@ export async function loadIpa(): Promise<{ candidates: IpaCandidate[]; points: I
   return { candidates: c.data as IpaCandidate[], points: p.data as Item[] };
 }
 
-export async function loadReferees(year: number): Promise<{ referees: Referee[]; games: RefereeGame[] }> {
+export async function loadReferees(year: number): Promise<{ referees: Referee[]; quota: RefereeQuota[] }> {
   const { supabase } = await requireSession();
-  const [r, g] = await Promise.all([
+  const [r, q] = await Promise.all([
     supabase.from("referees").select("*").order("name"),
-    supabase
-      .from("referee_games")
-      .select("*")
-      .gte("game_date", `${year}-01-01`)
-      .lte("game_date", `${year}-12-31`)
-      .order("game_date", { ascending: false }),
+    supabase.from("referee_quota").select("*").eq("year", year),
   ]);
   if (r.error) throw new Error(r.error.message);
-  if (g.error) throw new Error(g.error.message);
-  return { referees: r.data as Referee[], games: g.data as RefereeGame[] };
+  if (q.error) throw new Error(q.error.message);
+  return { referees: r.data as Referee[], quota: q.data as RefereeQuota[] };
 }
 
 export async function loadDone(areaId: string, limit = 10): Promise<Item[]> {
