@@ -2,14 +2,15 @@ import Link from "next/link";
 import { completeItem } from "@/app/actions";
 import { formatShort } from "@/lib/dates";
 import { countdown, recurLabel, type ClassifiedItem, type ItemState } from "@/lib/logic";
+import { AreaChip } from "./AreaChip";
 import { DoneButton } from "./SubmitButton";
 
-export const STATE_STYLE: Record<ItemState, { text: string; bar: string; label: string }> = {
-  overdue: { text: "text-red glow-red", bar: "bg-red", label: "Überfällig" },
-  today: { text: "text-amber glow-amber", bar: "bg-amber", label: "Heute" },
-  approach: { text: "text-cyan glow-cyan", bar: "bg-cyan", label: "Im Anflug" },
-  later: { text: "text-dim", bar: "bg-line", label: "Später" },
-  done: { text: "text-green", bar: "bg-green", label: "Gelandet" },
+export const STATE_STYLE: Record<ItemState, { text: string; pill: string; bar: string; label: string }> = {
+  overdue: { text: "text-red", pill: "bg-red text-white", bar: "bg-red", label: "Überfällig" },
+  today: { text: "text-amber", pill: "bg-sun text-ink", bar: "bg-sun", label: "Heute" },
+  approach: { text: "text-cyan", pill: "bg-cyan/12 text-cyan", bar: "bg-cyan", label: "Im Anflug" },
+  later: { text: "text-dim", pill: "bg-line/70 text-dim", bar: "bg-line", label: "Später" },
+  done: { text: "text-green", pill: "bg-green/15 text-green", bar: "bg-green", label: "Gelandet" },
 };
 
 export function ItemRow({
@@ -26,20 +27,20 @@ export function ItemRow({
   const s = STATE_STYLE[item.state];
   const recur = recurLabel(item.recur_every, item.recur_unit);
   return (
-    <li className="flex items-center gap-3 py-2">
+    <li className="flex items-center gap-3 py-2.5">
       <form action={completeItem.bind(null, item.id)}>
         <DoneButton label={item.title} />
       </form>
       <Link href={`/eintrag/${item.id}?back=${encodeURIComponent(back)}`} className="min-w-0 flex-1">
-        <div className="truncate">{item.title}</div>
-        <div className="truncate font-mono text-[0.7rem] text-dim">
-          {areaCode && <span className="text-cyan">{areaCode} · </span>}
-          {formatShort(item.due_date)}
-          {typeName && ` · ${typeName}`}
-          {recur && ` · ↻ ${recur}`}
+        <div className="truncate font-semibold">{item.title}</div>
+        <div className="flex items-center gap-1.5 truncate text-xs text-dim">
+          {areaCode && <AreaChip code={areaCode} />}
+          <span>{formatShort(item.due_date)}</span>
+          {typeName && <span>· {typeName}</span>}
+          {recur && <span>· ↻ {recur}</span>}
         </div>
       </Link>
-      <span className={`shrink-0 font-mono text-sm tabular-nums ${s.text}`}>{countdown(item.days)}</span>
+      <span className={`chip shrink-0 tabular-nums ${s.pill}`}>{countdown(item.days)}</span>
     </li>
   );
 }

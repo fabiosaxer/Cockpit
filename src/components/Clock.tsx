@@ -21,14 +21,14 @@ export function Clock() {
   }, []);
 
   return (
-    <div className="font-mono text-xs leading-tight text-right tabular-nums">
+    <div className="font-mono text-xs leading-tight text-right tabular-nums text-white drop-shadow-[0_1px_1px_rgba(10,60,110,0.4)]">
       <div>
-        <span className="text-dim">LT </span>
-        <span className="text-green">{now ? fmt(now, "Europe/Zurich") : "--:--"}</span>
+        <span className="opacity-75">LT </span>
+        <span className="font-bold">{now ? fmt(now, "Europe/Zurich") : "--:--"}</span>
       </div>
       <div>
-        <span className="text-dim">UTC </span>
-        <span className="text-cyan">{now ? fmt(now, "UTC").replace(":", "") + "Z" : "----Z"}</span>
+        <span className="opacity-75">UTC </span>
+        <span className="font-bold">{now ? fmt(now, "UTC").replace(":", "") + "Z" : "----Z"}</span>
       </div>
     </div>
   );

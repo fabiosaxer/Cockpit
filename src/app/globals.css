@@ -1,90 +1,77 @@
-@import url("https://fonts.googleapis.com/css2?family=B612:wght@400;700&family=B612+Mono:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=B612+Mono:wght@400;700&display=swap");
 @import "tailwindcss";
 
-/* Glass-Cockpit-Palette: angelehnt an Avionik-Konventionen
-   rot = Warnung, amber = Achtung, cyan = Aktion/Info, gruen = normal, magenta = aktive Route */
+/* Blauer Himmel: hell und froehlich, Statusfarben bleiben eindeutig
+   koralle = ueberfaellig, sonne = heute, himmelblau = im Anflug, gruen = erledigt, violett = naechster Wegpunkt */
 @theme {
-  --color-panel: #070a0e;
-  --color-bezel: #10161e;
-  --color-bezel-2: #161e29;
-  --color-line: #243041;
-  --color-ink: #e4ebf2;
-  --color-dim: #7f8c9c;
-  --color-cyan: #3fd8f2;
-  --color-green: #3ee083;
-  --color-amber: #ffb422;
-  --color-red: #ff4f4f;
-  --color-magenta: #ff62d9;
-  --font-sans: "B612", ui-sans-serif, system-ui, sans-serif;
+  --color-panel: #f3f9ff;
+  --color-bezel: #ffffff;
+  --color-bezel-2: #ffffff;
+  --color-line: #dbe9f6;
+  --color-ink: #12304a;
+  --color-dim: #6a83a0;
+  --color-cyan: #0b8ad6;
+  --color-green: #12a26a;
+  --color-amber: #e08600;
+  --color-sun: #ffc93c;
+  --color-red: #f0505a;
+  --color-magenta: #7c5cff;
+  --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "B612 Mono", ui-monospace, monospace;
 }
 
 html {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
-  background-color: var(--color-panel);
-  background-image:
-    radial-gradient(ellipse 120% 60% at 50% -10%, rgba(63, 216, 242, 0.07), transparent 60%),
-    linear-gradient(rgba(36, 48, 65, 0.25) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(36, 48, 65, 0.25) 1px, transparent 1px);
-  background-size: auto, 32px 32px, 32px 32px;
   color: var(--color-ink);
   font-family: var(--font-sans);
+  background-color: #f6fbff;
+  background-image:
+    url("/sky/clouds.svg"),
+    linear-gradient(180deg, #3fa9f2 0px, #7cc6f8 180px, #c4e6fd 380px, #eef7ff 620px, #f6fbff 900px);
+  background-repeat: no-repeat;
+  background-size: 1400px auto, 100% 100%;
+  background-position: top center, top left;
+  background-attachment: scroll;
   -webkit-tap-highlight-color: transparent;
 }
 
 @layer components {
-  /* Instrument: Gehaeuse mit Schrauben in den Ecken */
+  /* Karte: weiss wie eine Wolke */
   .instrument {
     position: relative;
-    background: linear-gradient(180deg, var(--color-bezel-2), var(--color-bezel));
-    border: 1px solid var(--color-line);
-    border-radius: 10px;
+    background: var(--color-bezel);
+    border: 1px solid rgba(219, 233, 246, 0.9);
+    border-radius: 22px;
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.04),
-      0 10px 30px -12px rgba(0, 0, 0, 0.8);
-  }
-  .instrument::before,
-  .instrument::after {
-    content: "";
-    position: absolute;
-    top: 7px;
-    width: 5px;
-    height: 5px;
-    border-radius: 9999px;
-    background: #2b3747;
-    box-shadow: inset 0 0 0 1px #0b0f15;
-  }
-  .instrument::before {
-    left: 7px;
-  }
-  .instrument::after {
-    right: 7px;
+      0 1px 2px rgba(18, 48, 74, 0.05),
+      0 12px 30px -14px rgba(11, 138, 214, 0.35);
   }
 
   .label {
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    letter-spacing: 0.16em;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--color-dim);
   }
 
   .field {
     width: 100%;
-    background: var(--color-panel);
-    border: 1px solid var(--color-line);
-    border-radius: 6px;
-    padding: 0.6rem 0.7rem;
+    background: #f6fbff;
+    border: 1.5px solid var(--color-line);
+    border-radius: 14px;
+    padding: 0.65rem 0.8rem;
     color: var(--color-ink);
     font-size: 16px; /* verhindert Zoom auf iOS */
   }
   .field:focus {
     outline: none;
     border-color: var(--color-cyan);
-    box-shadow: 0 0 0 2px rgba(63, 216, 242, 0.2);
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(11, 138, 214, 0.15);
   }
 
   .btn {
@@ -92,54 +79,80 @@ body {
     align-items: center;
     justify-content: center;
     gap: 0.4rem;
-    border-radius: 6px;
-    padding: 0.55rem 1rem;
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    border: 1px solid var(--color-line);
-    background: var(--color-bezel-2);
+    border-radius: 9999px;
+    padding: 0.6rem 1.1rem;
+    font-weight: 800;
+    font-size: 0.9rem;
+    border: 1.5px solid var(--color-line);
+    background: #fff;
     color: var(--color-ink);
+    transition: transform 0.1s ease;
+  }
+  .btn:active {
+    transform: scale(0.97);
   }
   .btn-primary {
-    background: var(--color-cyan);
-    border-color: var(--color-cyan);
-    color: #031016;
-    font-weight: 700;
+    background: linear-gradient(180deg, #24a3f0, #0b8ad6);
+    border-color: #0b8ad6;
+    color: #fff;
+    box-shadow: 0 8px 18px -8px rgba(11, 138, 214, 0.7);
   }
   .btn-danger {
-    border-color: rgba(255, 79, 79, 0.5);
+    border-color: rgba(240, 80, 90, 0.4);
     color: var(--color-red);
   }
 
-  .glow-red {
-    text-shadow: 0 0 8px rgba(255, 79, 79, 0.6);
-  }
-  .glow-amber {
-    text-shadow: 0 0 8px rgba(255, 180, 34, 0.5);
-  }
-  .glow-cyan {
-    text-shadow: 0 0 8px rgba(63, 216, 242, 0.45);
-  }
+  /* Glow-Klassen aus dem dunklen Design: im hellen Design ohne Effekt */
+  .glow-red,
+  .glow-amber,
+  .glow-cyan,
   .glow-green {
-    text-shadow: 0 0 8px rgba(62, 224, 131, 0.45);
+    text-shadow: none;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 9999px;
+    padding: 0.1rem 0.55rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
   }
 }
 
-@keyframes caution-blink {
-  0%,
-  60% {
-    opacity: 1;
+@keyframes fly {
+  0% {
+    transform: translateX(-10vw) translateY(6px);
   }
-  80% {
-    opacity: 0.55;
+  50% {
+    transform: translateX(45vw) translateY(-4px);
+  }
+  100% {
+    transform: translateX(105vw) translateY(6px);
+  }
+}
+.plane {
+  animation: fly 38s linear infinite;
+}
+
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-6deg);
   }
 }
 .blink {
-  animation: caution-blink 2.4s ease-in-out infinite;
+  animation: wiggle 2.4s ease-in-out infinite;
+  transform-origin: center;
 }
+
 @media (prefers-reduced-motion: reduce) {
+  .plane,
   .blink {
     animation: none;
   }

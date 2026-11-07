@@ -21,9 +21,9 @@ export default async function EditItemPage({
 
   return (
     <div className="mx-auto max-w-lg space-y-4">
-      <Link href={back} className="label text-cyan">‹ Zurück</Link>
+      <Link href={back} className="font-bold text-white">‹ Zurück</Link>
       <section className="instrument p-5 pt-4">
-        <h1 className="mb-4 px-2 font-mono text-sm tracking-[0.2em] text-cyan">EINTRAG BEARBEITEN</h1>
+        <h1 className="mb-4 px-1 text-lg font-black">✏️ Eintrag bearbeiten</h1>
         <ItemForm
           areas={areas}
           types={types}

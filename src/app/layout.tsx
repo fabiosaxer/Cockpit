@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "Cockpit",
   description: "Persönliches Cockpit für Termine, Abgaben und Projekte",
   applicationName: "Cockpit",
-  appleWebApp: { capable: true, title: "Cockpit", statusBarStyle: "black-translucent" },
+  appleWebApp: { capable: true, title: "Cockpit", statusBarStyle: "default" },
   icons: {
     icon: [{ url: "/icons/icon.svg", type: "image/svg+xml" }],
     apple: "/apple-touch-icon.png",
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#070a0e",
+  themeColor: "#3fa9f2",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",

@@ -24,12 +24,12 @@ export function DoneButton({ label }: { label: string }) {
       type="submit"
       disabled={pending}
       aria-label={`Erledigt: ${label}`}
-      className="grid size-7 shrink-0 place-items-center rounded-full border border-line bg-panel text-green transition hover:border-green"
+      className="group grid size-7 shrink-0 place-items-center rounded-full border-2 border-cyan/40 bg-white text-white transition hover:border-green hover:bg-green"
     >
       {pending ? (
-        <span className="size-2.5 animate-pulse rounded-full bg-green" />
+        <span className="size-3 animate-ping rounded-full bg-green" />
       ) : (
-        <svg viewBox="0 0 16 16" className="size-3.5 opacity-0 transition hover:opacity-100" aria-hidden="true">
+        <svg viewBox="0 0 16 16" className="size-3.5 opacity-0 transition group-hover:opacity-100" aria-hidden="true">
           <path d="M3 8.5l3.2 3L13 4.5" fill="none" stroke="currentColor" strokeWidth="2" />
         </svg>
       )}

@@ -12,10 +12,10 @@ export default async function ProjectsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="font-mono text-sm tracking-[0.25em] text-cyan">PROJEKTE IM LEAD</h1>
+      <h1 className="text-2xl font-black text-white drop-shadow-[0_1px_2px_rgba(10,60,110,0.35)]">🧭 Projekte im Lead</h1>
 
       {sorted.length === 0 && (
-        <p className="instrument py-6 text-center font-mono text-xs tracking-[0.2em] text-dim">KEINE AKTIVEN PROJEKTE</p>
+        <p className="instrument py-6 text-center text-sm font-bold text-dim">Noch keine aktiven Projekte</p>
       )}
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {sorted.map((p) => (

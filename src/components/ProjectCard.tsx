@@ -14,7 +14,7 @@ export function ProjectCard({ project, areaCode, today }: { project: Project; ar
         <StatusLight status={project.status} size="size-3" />
         <div className="min-w-0 flex-1">
           <div className="truncate font-bold">{project.title}</div>
-          <div className="font-mono text-[0.7rem] text-dim">
+          <div className="text-xs text-dim">
             {areaCode && <span className="text-cyan">{areaCode} · </span>}
             {STATUS_LABEL[project.status]}
             {project.next_milestone && (
@@ -28,7 +28,7 @@ export function ProjectCard({ project, areaCode, today }: { project: Project; ar
       </div>
 
       {project.next_step && (
-        <p className="mt-3 border-l-2 border-cyan/60 pl-3 text-sm">
+        <p className="mt-3 rounded-xl bg-cyan/8 px-3 py-2 text-sm">
           <span className="label block">Nächster Schritt</span>
           {project.next_step}
         </p>
@@ -42,14 +42,14 @@ export function ProjectCard({ project, areaCode, today }: { project: Project; ar
               className={`btn w-full gap-2 px-2 ${project.status === s ? "border-ink/40" : "opacity-60"}`}
             >
               <StatusLight status={s} size="size-2" />
-              <span className="text-[0.65rem]">{STATUS_LABEL[s]}</span>
+              <span className="text-xs">{STATUS_LABEL[s]}</span>
             </button>
           </form>
         ))}
       </div>
 
       <details className="mt-3">
-        <summary className="label cursor-pointer text-cyan">Bearbeiten</summary>
+        <summary className="cursor-pointer text-sm font-bold text-cyan">Bearbeiten</summary>
         <form action={updateProject.bind(null, project.id)} className="mt-3 space-y-3">
           <input type="hidden" name="status" value={project.status} />
           <input name="title" defaultValue={project.title} className="field" aria-label="Titel" />

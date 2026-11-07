@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 420">
+  <g fill="#ffffff">
+    <g opacity="0.85">
+      <ellipse cx="140" cy="118" rx="70" ry="26"/><ellipse cx="185" cy="100" rx="48" ry="34"/><ellipse cx="225" cy="120" rx="58" ry="22"/>
+    </g>
+    <g opacity="0.7">
+      <ellipse cx="1150" cy="70" rx="80" ry="24"/><ellipse cx="1200" cy="52" rx="52" ry="32"/><ellipse cx="1250" cy="74" rx="62" ry="20"/>
+    </g>
+    <g opacity="0.55">
+      <ellipse cx="640" cy="40" rx="50" ry="14"/><ellipse cx="670" cy="30" rx="34" ry="18"/>
+    </g>
+    <g opacity="0.6">
+      <ellipse cx="900" cy="250" rx="90" ry="24"/><ellipse cx="955" cy="232" rx="56" ry="32"/><ellipse cx="1010" cy="254" rx="70" ry="20"/>
+    </g>
+    <g opacity="0.5">
+      <ellipse cx="330" cy="300" rx="70" ry="18"/><ellipse cx="370" cy="286" rx="42" ry="24"/>
+    </g>
+  </g>
+</svg>

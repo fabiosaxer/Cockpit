@@ -15,10 +15,10 @@ Die vollständigen Anforderungen stehen im Dokument "Life Cockpit – Anforderun
 
 ## Design
 
-Glass-Cockpit-Look (Aviatik): dunkles Instrumentenpanel, Schriften B612 und B612 Mono.
+Design "Blauer Himmel" (Aviatik, hell und fröhlich): Himmelverlauf mit Wolken und Flugzeug, weisse Karten, Schriften Nunito und B612 Mono. Jeder Bereich hat eine eigene Farbe (`src/lib/areaColors.ts`).
 Farben nach Avionik-Konvention, definiert in `src/app/globals.css`:
-rot = überfällig (Warning), amber = heute (Caution), cyan = im Anflug (Vorlauf), grün = erledigt/normal,
-magenta = nächster Wegpunkt. Countdown als T-5 / HEUTE / T+2. Begriffe: "Im Anflug", "Gelandet", "Nächster Wegpunkt".
+koralle = überfällig, sonnengelb = heute, himmelblau = im Anflug (Vorlauf), grün = erledigt/normal,
+violett = nächster Wegpunkt. Countdown als T-5 / HEUTE / T+2. Begriffe: "Im Anflug", "Gelandet", "Nächster Wegpunkt".
 
 ## Code-Struktur
 

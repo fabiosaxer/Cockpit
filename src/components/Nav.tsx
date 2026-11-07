@@ -12,7 +12,7 @@ const LINKS = [
 export function Nav() {
   const path = usePathname();
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-panel/95 pb-[env(safe-area-inset-bottom)] backdrop-blur sm:static sm:border-0 sm:bg-transparent sm:pb-0">
+    <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-white/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_24px_-12px_rgba(11,138,214,0.35)] backdrop-blur sm:static sm:border-0 sm:bg-transparent sm:pb-0 sm:shadow-none">
       <ul className="mx-auto flex max-w-md justify-around sm:max-w-none sm:justify-end sm:gap-1">
         {LINKS.map((l) => {
           const active = l.href === "/" ? path === "/" || path.startsWith("/bereich") : path.startsWith(l.href);
@@ -20,8 +20,8 @@ export function Nav() {
             <li key={l.href}>
               <Link
                 href={l.href}
-                className={`flex flex-col items-center gap-1 px-4 py-2 font-mono text-[0.65rem] tracking-[0.15em] uppercase sm:flex-row ${
-                  active ? "text-cyan glow-cyan" : "text-dim"
+                className={`flex flex-col items-center gap-1 rounded-full px-4 py-2 text-xs font-extrabold sm:flex-row ${
+                  active ? "text-cyan sm:bg-white sm:shadow" : "text-dim sm:text-white/90"
                 }`}
               >
                 <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">

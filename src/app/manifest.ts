@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "Persönliches Cockpit für Termine, Abgaben und Projekte",
     start_url: "/",
     display: "standalone",
-    background_color: "#070a0e",
-    theme_color: "#070a0e",
+    background_color: "#3fa9f2",
+    theme_color: "#3fa9f2",
     lang: "de-CH",
     icons: [
       { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },

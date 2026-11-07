@@ -8,7 +8,7 @@ export default async function SettingsPage() {
 
   return (
     <div className="max-w-xl space-y-5">
-      <h1 className="font-mono text-sm tracking-[0.25em] text-cyan">SETUP</h1>
+      <h1 className="text-2xl font-black text-white drop-shadow-[0_1px_2px_rgba(10,60,110,0.35)]">⚙️ Setup</h1>
 
       <section className="instrument p-4 pt-3">
         <h2 className="label px-2">Typen & Vorlauf (Tage)</h2>

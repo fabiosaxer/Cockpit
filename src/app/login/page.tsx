@@ -13,8 +13,8 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
       <div className="instrument w-full max-w-sm p-6 pt-8">
         <div className="flex flex-col items-center gap-3">
           <Logo size={64} />
-          <div className="font-mono text-lg font-bold tracking-[0.35em]">COCKPIT</div>
-          <div className="label">Preflight Check · Anmeldung</div>
+          <div className="text-2xl font-black">Cockpit</div>
+          <div className="label">✈️ Willkommen an Bord</div>
         </div>
         {error && ERRORS[error] && (
           <p className="mt-5 rounded-md border border-red/60 bg-red/10 p-2 text-center font-mono text-xs text-red">

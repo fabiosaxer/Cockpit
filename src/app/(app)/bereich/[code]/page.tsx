@@ -6,6 +6,7 @@ import { ProjectCard } from "@/components/ProjectCard";
 import { QuickAdd } from "@/components/QuickAdd";
 import { SubmitButton } from "@/components/SubmitButton";
 import { loadCockpit, loadDone } from "@/lib/data";
+import { areaColor } from "@/lib/areaColors";
 import { classifyAll, type ItemState } from "@/lib/logic";
 
 const SECTIONS: ItemState[] = ["overdue", "today", "approach", "later"];
@@ -24,18 +25,18 @@ export default async function AreaPage({ params }: { params: Promise<{ code: str
 
   return (
     <div className="space-y-5">
-      <div className="flex items-baseline gap-3">
-        <Link href="/" className="label text-cyan">‹ Cockpit</Link>
-        <h1 className="flex items-baseline gap-2">
-          <span className="font-mono text-xl font-bold tracking-widest text-cyan">{area.code}</span>
-          <span className="text-lg">{area.name}</span>
+      <div className="flex items-center gap-3">
+        <Link href="/" className="font-bold text-white/90">‹ Cockpit</Link>
+        <h1 className="flex items-center gap-2">
+          <span className="chip bg-white text-base" style={{ color: areaColor(area.code) }}>{area.code}</span>
+          <span className="text-2xl font-black text-white drop-shadow-[0_1px_2px_rgba(10,60,110,0.35)]">{area.name}</span>
         </h1>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[1fr_22rem]">
         <section className="instrument p-4 pt-3">
           {all.length === 0 && (
-            <p className="py-6 text-center font-mono text-xs tracking-[0.2em] text-green/80">CLEAR · KEINE OFFENEN EINTRÄGE</p>
+            <p className="py-6 text-center text-sm font-bold text-green">☁️ Freier Himmel, keine offenen Einträge</p>
           )}
           {SECTIONS.map((state) => {
             const list = all.filter((i) => i.state === state);
@@ -43,7 +44,7 @@ export default async function AreaPage({ params }: { params: Promise<{ code: str
             return (
               <div key={state} className="mt-2 px-2">
                 <div className="flex items-center gap-2">
-                  <span className={`h-3 w-1 rounded-sm ${STATE_STYLE[state].bar}`} />
+                  <span className={`size-2.5 rounded-full ${STATE_STYLE[state].bar}`} />
                   <span className="label">{STATE_STYLE[state].label} · {list.length}</span>
                 </div>
                 <ul className="divide-y divide-line/60">

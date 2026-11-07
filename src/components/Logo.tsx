@@ -7,7 +7,7 @@ export function Logo({ size = 28 }: { size?: number }) {
           <circle cx="32" cy="32" r="26" />
         </clipPath>
       </defs>
-      <circle cx="32" cy="32" r="30" fill="#10161e" stroke="#243041" strokeWidth="2" />
+      <circle cx="32" cy="32" r="30" fill="#ffffff" stroke="#ffffff" strokeWidth="2" />
       <g clipPath="url(#logo-ai)" transform="rotate(-12 32 32)">
         <rect x="0" y="0" width="64" height="35" fill="#1d7fb3" />
         <rect x="0" y="35" width="64" height="30" fill="#7a4a24" />
