@@ -7,7 +7,8 @@ Next.js 15 · Supabase · Vercel. Kontext für Claude Code steht in `CLAUDE.md`.
 ## Setup (einmalig)
 
 ### 1. Supabase
-1. **SQL Editor** → Inhalt von `supabase/migrations/20261107000000_init.sql` einfügen → Run.
+1. **SQL Editor** → die Dateien in `supabase/migrations/` der Reihe nach einfügen und ausführen (Run):
+   `20261107000000_init.sql`, dann `20261108000000_absences_ipa_referees.sql`.
 2. **Authentication → URL Configuration**
    - Site URL: `https://cockpit.saxer.sg`
    - Redirect URLs: `https://cockpit.saxer.sg/**`, `https://*.vercel.app/**`, `http://localhost:3000/**`
@@ -53,3 +54,7 @@ cp .env.example .env.local   # Werte eintragen
 npm install
 npm run dev
 ```
+
+## Datenbank-Änderungen
+Neue Migrationen liegen in `supabase/migrations/`. Jede Datei einmal im Supabase **SQL Editor** ausführen,
+in der Reihenfolge des Dateinamens.

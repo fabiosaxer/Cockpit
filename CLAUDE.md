@@ -17,8 +17,10 @@ Die vollständigen Anforderungen stehen im Dokument "Life Cockpit – Anforderun
 
 Design "Blauer Himmel" (Aviatik, hell und fröhlich): Himmelverlauf mit Wolken und Flugzeug, weisse Karten, Schriften Nunito und B612 Mono. Jeder Bereich hat eine eigene Farbe (`src/lib/areaColors.ts`).
 Farben nach Avionik-Konvention, definiert in `src/app/globals.css`:
-koralle = überfällig, sonnengelb = heute, himmelblau = im Anflug (Vorlauf), grün = erledigt/normal,
-violett = nächster Wegpunkt. Countdown als T-5 / HEUTE / T+2. Begriffe: "Im Anflug", "Gelandet", "Nächster Wegpunkt".
+koralle = überfällig, sonnengelb = heute, himmelblau = demnächst (Vorlauf), grün = erledigt/normal,
+violett = als Nächstes. Countdown als T-5 / HEUTE / T+2.
+Texte schlicht und klar halten. Aviatik nur als kleine Anspielung (Flugzeug, Logo, Countdown), nicht in jedem Begriff.
+Begriffe: "Demnächst" (im Vorlauf), "Erledigt", "Als Nächstes".
 
 ## Code-Struktur
 

@@ -12,7 +12,7 @@ export default async function ProjectsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-black text-white drop-shadow-[0_1px_2px_rgba(10,60,110,0.35)]">🧭 Projekte im Lead</h1>
+      <h1 className="text-2xl font-black text-white drop-shadow-[0_1px_2px_rgba(10,60,110,0.35)]">Projekte</h1>
 
       {sorted.length === 0 && (
         <p className="instrument py-6 text-center text-sm font-bold text-dim">Noch keine aktiven Projekte</p>

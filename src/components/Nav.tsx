@@ -6,7 +6,8 @@ import { usePathname } from "next/navigation";
 const LINKS = [
   { href: "/", label: "Cockpit", icon: "M3 13a9 9 0 0 1 18 0M12 13l4-4M7 13h0M17 13h0" },
   { href: "/projekte", label: "Projekte", icon: "M4 6h16M4 12h10M4 18h13" },
-  { href: "/einstellungen", label: "Setup", icon: "M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6zM12 2v3M12 19v3M2 12h3M19 12h3" },
+  { href: "/abwesenheiten", label: "Abwesend", icon: "M8 7V4h8v3M3 7h18v12H3zM3 12h18" },
+  { href: "/einstellungen", label: "Einstellungen", icon: "M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6zM12 2v3M12 19v3M2 12h3M19 12h3" },
 ];
 
 export function Nav() {
@@ -20,7 +21,7 @@ export function Nav() {
             <li key={l.href}>
               <Link
                 href={l.href}
-                className={`flex flex-col items-center gap-1 rounded-full px-4 py-2 text-xs font-extrabold sm:flex-row ${
+                className={`flex flex-col items-center gap-1 rounded-full px-3 py-2 text-xs font-extrabold sm:flex-row ${
                   active ? "text-cyan sm:bg-white sm:shadow" : "text-dim sm:text-white/90"
                 }`}
               >

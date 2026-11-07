@@ -1,5 +1,6 @@
+import { absenceConflict } from "./absences";
 import { diffDays } from "./dates";
-import type { Item, ItemType, RecurUnit } from "./types";
+import type { Absence, Item, ItemType, RecurUnit } from "./types";
 
 export type ItemState = "overdue" | "today" | "approach" | "later" | "done";
 
@@ -36,13 +37,26 @@ export function countdown(days: number): string {
   return days > 0 ? `T-${days}` : `T+${-days}`;
 }
 
-export type ClassifiedItem = Item & { state: ItemState; days: number; lead: number };
+export type ClassifiedItem = Item & {
+  state: ItemState;
+  days: number;
+  lead: number;
+  /** Fixe Frist waehrend oder kurz nach einer Abwesenheit */
+  conflict?: Absence;
+};
 
-export function classifyAll(items: Item[], types: ItemType[], today: string): ClassifiedItem[] {
+export function classifyAll(
+  items: Item[],
+  types: ItemType[],
+  today: string,
+  absences: Absence[] = [],
+): ClassifiedItem[] {
   return items
     .map((item) => {
       const lead = effectiveLead(item, types);
-      return { ...item, lead, ...classify(item, lead, today) };
+      const conflict =
+        !item.recur_every && item.due_date >= today ? absenceConflict(item.due_date, absences) : undefined;
+      return { ...item, lead, conflict, ...classify(item, lead, today) };
     })
     .sort(
       (a, b) =>

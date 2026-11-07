@@ -61,7 +61,7 @@ export function ProjectCard({ project, areaCode, today }: { project: Project; ar
           <SubmitButton className="btn btn-primary w-full">Speichern</SubmitButton>
         </form>
         <form action={archiveProject.bind(null, project.id)} className="mt-2">
-          <SubmitButton className="btn btn-danger w-full">Archivieren (gelandet)</SubmitButton>
+          <SubmitButton className="btn btn-danger w-full">Archivieren</SubmitButton>
         </form>
       </details>
     </article>

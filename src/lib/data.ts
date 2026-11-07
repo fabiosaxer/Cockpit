@@ -1,8 +1,8 @@
 import "server-only";
 import { redirect } from "next/navigation";
 import { createClient } from "./supabase/server";
-import { todayISO } from "./dates";
-import type { Area, Item, ItemType, Project } from "./types";
+import { addDays, todayISO } from "./dates";
+import type { Absence, Area, IpaCandidate, Item, ItemType, Project, Referee, RefereeGame } from "./types";
 
 const DEFAULT_AREAS = [
   { code: "BUE", name: "Bühler", sort: 10 },
@@ -36,6 +36,7 @@ export type Cockpit = {
   types: ItemType[];
   items: Item[];
   projects: Project[];
+  absences: Absence[];
   today: string;
 };
 
@@ -49,11 +50,13 @@ export async function loadCockpit(): Promise<Cockpit> {
     await supabase.from("item_types").insert(DEFAULT_TYPES);
   }
 
-  const [areas, types, items, projects] = await Promise.all([
+  const today = todayISO();
+  const [areas, types, items, projects, absences] = await Promise.all([
     supabase.from("areas").select("*").order("sort"),
     supabase.from("item_types").select("*").order("sort"),
     supabase.from("items").select("*").is("done_at", null).order("due_date"),
     supabase.from("projects").select("*").is("archived_at", null).order("created_at"),
+    supabase.from("absences").select("*").gte("end_date", addDays(today, -3)).order("start_date"),
   ]);
 
   for (const r of [areas, types, items, projects]) {
@@ -65,8 +68,48 @@ export async function loadCockpit(): Promise<Cockpit> {
     types: types.data as ItemType[],
     items: items.data as Item[],
     projects: projects.data as Project[],
-    today: todayISO(),
+    // Tabelle fehlt, solange die zweite Migration nicht ausgefuehrt ist: dann einfach leer
+    absences: (absences.error ? [] : absences.data) as Absence[],
+    today,
   };
+}
+
+export async function loadAbsences(): Promise<Absence[]> {
+  const { supabase } = await requireSession();
+  const { data, error } = await supabase
+    .from("absences")
+    .select("*")
+    .gte("end_date", addDays(todayISO(), -60))
+    .order("start_date");
+  if (error) throw new Error(error.message);
+  return data as Absence[];
+}
+
+export async function loadIpa(): Promise<{ candidates: IpaCandidate[]; points: Item[] }> {
+  const { supabase } = await requireSession();
+  const [c, p] = await Promise.all([
+    supabase.from("ipa_candidates").select("*").order("start_date", { ascending: false }),
+    supabase.from("items").select("*").not("ipa_candidate_id", "is", null).order("due_date"),
+  ]);
+  if (c.error) throw new Error(c.error.message);
+  if (p.error) throw new Error(p.error.message);
+  return { candidates: c.data as IpaCandidate[], points: p.data as Item[] };
+}
+
+export async function loadReferees(year: number): Promise<{ referees: Referee[]; games: RefereeGame[] }> {
+  const { supabase } = await requireSession();
+  const [r, g] = await Promise.all([
+    supabase.from("referees").select("*").order("name"),
+    supabase
+      .from("referee_games")
+      .select("*")
+      .gte("game_date", `${year}-01-01`)
+      .lte("game_date", `${year}-12-31`)
+      .order("game_date", { ascending: false }),
+  ]);
+  if (r.error) throw new Error(r.error.message);
+  if (g.error) throw new Error(g.error.message);
+  return { referees: r.data as Referee[], games: g.data as RefereeGame[] };
 }
 
 export async function loadDone(areaId: string, limit = 10): Promise<Item[]> {

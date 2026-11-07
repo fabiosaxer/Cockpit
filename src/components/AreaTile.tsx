@@ -13,11 +13,13 @@ export function AreaTile({
   items,
   projects,
   types,
+  extra,
 }: {
   area: Area;
   items: ClassifiedItem[];
   projects: Project[];
   types: ItemType[];
+  extra?: React.ReactNode;
 }) {
   const active = items.filter((i) => i.state !== "later");
   const next = items.find((i) => i.state === "later");
@@ -53,7 +55,7 @@ export function AreaTile({
             ))}
           </ul>
         ) : (
-          <p className="py-5 text-center text-sm font-bold text-green">☁️ Freier Himmel, nichts im Anflug</p>
+          <p className="py-5 text-center text-sm font-bold text-green">Nichts Dringendes</p>
         )}
         {hidden > 0 && (
           <Link href={`/bereich/${area.code}`} className="pt-1 text-sm font-bold text-cyan">
@@ -62,9 +64,10 @@ export function AreaTile({
         )}
 
         <div className="mt-auto space-y-1.5 pt-3">
+          {extra}
           {next && (
             <div className="flex items-center gap-2 rounded-xl bg-magenta/8 px-3 py-1.5 text-sm">
-              <span className="shrink-0 text-xs font-extrabold text-magenta">NÄCHSTER WEGPUNKT</span>
+              <span className="shrink-0 text-xs font-extrabold text-magenta">ALS NÄCHSTES</span>
               <span className="truncate text-ink/80">
                 {next.title} · {formatShort(next.due_date)}
               </span>

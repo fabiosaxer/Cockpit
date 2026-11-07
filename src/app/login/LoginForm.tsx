@@ -53,7 +53,7 @@ export function LoginForm({ microsoft }: { microsoft: boolean }) {
   if (state === "sent") {
     return (
       <p className="mt-6 text-center font-mono text-sm text-green glow-green">
-        CLEARED · Link unterwegs.
+        Link ist unterwegs.
         <br />
         <span className="text-xs text-dim">Öffne den Link im selben Browser, in dem du ihn angefordert hast.</span>
       </p>

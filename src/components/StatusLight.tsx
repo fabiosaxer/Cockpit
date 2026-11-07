@@ -7,7 +7,7 @@ const COLORS: Record<ProjectStatus, string> = {
 };
 
 export const STATUS_LABEL: Record<ProjectStatus, string> = {
-  green: "Auf Kurs",
+  green: "Im Plan",
   amber: "Achtung",
   red: "Kritisch",
 };

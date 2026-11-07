@@ -72,7 +72,7 @@ export function ItemForm({
         <span className="label">Fällig am</span>
         <input type="date" name="due_date" required defaultValue={item?.due_date ?? today} className="field" />
         <span className="block font-mono text-[0.7rem] text-cyan">
-          Im Anflug ab T-{item?.lead_days ?? typeLead} {item?.lead_days == null && "(Standard des Typs)"}
+          Sichtbar ab {item?.lead_days ?? typeLead} Tagen vorher {item?.lead_days == null && "(Standard des Typs)"}
         </span>
       </label>
 

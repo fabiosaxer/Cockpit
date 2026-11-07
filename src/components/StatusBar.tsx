@@ -11,20 +11,20 @@ export function StatusBar({
   const cells = [
     { label: "Überfällig", value: overdue, color: "#f0505a", icon: "M12 8v5M12 16.5v.5M10.3 3.9 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" },
     { label: "Heute", value: today, color: "#f2a900", icon: "M12 4V2M12 22v-2M4 12H2M22 12h-2M5.6 5.6 4.2 4.2M19.8 19.8l-1.4-1.4M5.6 18.4l-1.4 1.4M19.8 4.2l-1.4 1.4M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" },
-    { label: "Im Anflug", value: approach, color: "#0b8ad6", icon: "M2.5 19h19M3 13.5l3 .8 3.2-2.4-6-4 1.7-.6 8.3 2.6 4.2-2.2a1.8 1.8 0 0 1 1.7 3.2L7.3 17.2z" },
+    { label: "Demnächst", value: approach, color: "#0b8ad6", icon: "M2.5 19h19M3 13.5l3 .8 3.2-2.4-6-4 1.7-.6 8.3 2.6 4.2-2.2a1.8 1.8 0 0 1 1.7 3.2L7.3 17.2z" },
   ];
 
   let headline: React.ReactNode;
   if (overdue > 0) {
     headline = (
       <>
-        <span className="blink inline-block">⚠️</span> {overdue} {overdue === 1 ? "Punkt ist" : "Punkte sind"} überfällig. Zeit zum Durchstarten!
+        {overdue} {overdue === 1 ? "Punkt ist" : "Punkte sind"} überfällig.
       </>
     );
   } else if (today > 0) {
-    headline = <>☀️ {today} {today === 1 ? "Sache steht" : "Sachen stehen"} heute an. Guten Flug!</>;
+    headline = <>Heute {today === 1 ? "steht 1 Sache" : `stehen ${today} Sachen`} an.</>;
   } else {
-    headline = <>✈️ Alles auf Kurs. Geniess den Reiseflug!</>;
+    headline = <>Heute ist nichts fällig. Schönen Tag!</>;
   }
 
   return (

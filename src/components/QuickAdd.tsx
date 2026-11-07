@@ -33,7 +33,7 @@ export function QuickAdd(props: Omit<ItemFormProps, "action" | "submitLabel">) {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex items-center justify-between px-2">
-              <span className="text-lg font-black">✈️ Neuer Eintrag</span>
+              <span className="text-lg font-black">Neuer Eintrag</span>
               <button type="button" onClick={() => setOpen(false)} className="label" aria-label="Schliessen">
                 ✕
               </button>

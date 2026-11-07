@@ -21,6 +21,7 @@ export type Item = {
   type_id: string | null;
   project_id: string | null;
   parent_id: string | null;
+  ipa_candidate_id?: string | null;
   title: string;
   due_date: string;
   lead_days: number | null;
@@ -38,4 +39,33 @@ export type Project = {
   next_step: string | null;
   next_milestone: string | null;
   archived_at: string | null;
+};
+
+export type Absence = {
+  id: string;
+  title: string;
+  start_date: string;
+  end_date: string;
+};
+
+export type IpaCandidate = {
+  id: string;
+  code: string;
+  start_date: string;
+  end_date: string;
+  presentation_date: string | null;
+};
+
+export type Referee = {
+  id: string;
+  name: string;
+  kind: "verein" | "mini";
+  active: boolean;
+};
+
+export type RefereeGame = {
+  id: string;
+  referee_id: string;
+  game_date: string;
+  note: string | null;
 };

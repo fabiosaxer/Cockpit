@@ -3,7 +3,9 @@ import { notFound } from "next/navigation";
 import { createProject, restoreItem } from "@/app/actions";
 import { ItemRow, STATE_STYLE } from "@/components/ItemRow";
 import { ProjectCard } from "@/components/ProjectCard";
+import { IpaSection } from "@/components/IpaSection";
 import { QuickAdd } from "@/components/QuickAdd";
+import { QuotaSection } from "@/components/QuotaSection";
 import { SubmitButton } from "@/components/SubmitButton";
 import { loadCockpit, loadDone } from "@/lib/data";
 import { areaColor } from "@/lib/areaColors";
@@ -11,14 +13,23 @@ import { classifyAll, type ItemState } from "@/lib/logic";
 
 const SECTIONS: ItemState[] = ["overdue", "today", "approach", "later"];
 
-export default async function AreaPage({ params }: { params: Promise<{ code: string }> }) {
+export default async function AreaPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ code: string }>;
+  searchParams: Promise<{ jahr?: string }>;
+}) {
   const { code } = await params;
-  const { areas, types, items, projects, today } = await loadCockpit();
+  const { jahr } = await searchParams;
+  const { areas, types, items, projects, absences, today } = await loadCockpit();
   const area = areas.find((a) => a.code.toLowerCase() === code.toLowerCase());
   if (!area) notFound();
 
   const back = `/bereich/${area.code}`;
-  const all = classifyAll(items.filter((i) => i.area_id === area.id), types, today);
+  const all = classifyAll(items.filter((i) => i.area_id === area.id), types, today, absences);
+  const currentYear = Number(today.slice(0, 4));
+  const year = Math.min(currentYear, Number(jahr) || currentYear);
   const areaProjects = projects.filter((p) => p.area_id === area.id);
   const done = await loadDone(area.id);
   const typeName = (id: string | null) => types.find((t) => t.id === id)?.name;
@@ -33,10 +44,13 @@ export default async function AreaPage({ params }: { params: Promise<{ code: str
         </h1>
       </div>
 
+      {area.code === "IPA" && <IpaSection today={today} />}
+      {area.code === "FCZ" && <QuotaSection today={today} year={year} />}
+
       <div className="grid gap-4 lg:grid-cols-[1fr_22rem]">
         <section className="instrument p-4 pt-3">
           {all.length === 0 && (
-            <p className="py-6 text-center text-sm font-bold text-green">☁️ Freier Himmel, keine offenen Einträge</p>
+            <p className="py-6 text-center text-sm font-bold text-green">Keine offenen Einträge</p>
           )}
           {SECTIONS.map((state) => {
             const list = all.filter((i) => i.state === state);
@@ -78,7 +92,7 @@ export default async function AreaPage({ params }: { params: Promise<{ code: str
 
           {done.length > 0 && (
             <div className="instrument p-4 pt-3">
-              <h2 className="label px-2">Gelandet</h2>
+              <h2 className="label px-2">Zuletzt erledigt</h2>
               <ul className="mt-2 divide-y divide-line/60">
                 {done.map((i) => (
                   <li key={i.id} className="flex items-center gap-2 py-2 text-sm">
