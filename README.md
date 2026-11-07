@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Cockpit
 
-## Getting Started
+Persönliches Cockpit für Termine, Abgaben und Projekte. Läuft unter https://cockpit.saxer.sg.
 
-First, run the development server:
+Next.js 15 · Supabase · Vercel. Kontext für Claude Code steht in `CLAUDE.md`.
 
+## Setup (einmalig)
+
+### 1. Supabase
+1. **SQL Editor** → Inhalt von `supabase/migrations/20261107000000_init.sql` einfügen → Run.
+2. **Authentication → URL Configuration**
+   - Site URL: `https://cockpit.saxer.sg`
+   - Redirect URLs: `https://cockpit.saxer.sg/auth/callback`, `http://localhost:3000/auth/callback`
+3. **Project Settings → API**: Project URL und `anon` Key kopieren.
+
+### 2. Vercel
+1. **Add New → Project** → Repo `fabiosaxer/cockpit` importieren (Framework: Next.js).
+2. Environment Variables (siehe `.env.example`):
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `ALLOWED_EMAIL` = deine Login-Adresse
+   - `NEXT_PUBLIC_AUTH_MICROSOFT` = `false`
+3. Deploy.
+4. **Settings → Domains** → `cockpit.saxer.sg` hinzufügen. Vercel zeigt den CNAME-Wert an.
+
+### 3. DNS in Plesk (Hosttime)
+Websites & Domains → saxer.sg → **DNS-Einstellungen** → Eintrag hinzufügen:
+- Typ `CNAME`, Name `cockpit`, Wert: der von Vercel angezeigte Wert (meist `cname.vercel-dns.com.`)
+
+### 4. Erster Login
+1. https://cockpit.saxer.sg öffnen, Login-Link anfordern, Link auf demselben Gerät öffnen.
+2. Bereiche und Typen werden beim ersten Login automatisch angelegt.
+3. Danach in Supabase **Authentication → Providers → Email → „Allow new users to sign up“ ausschalten**.
+   So kann niemand sonst ein Konto anlegen.
+
+### 5. Als App installieren
+- iPhone/iPad: Safari → Teilen → „Zum Home-Bildschirm“.
+
+## Optional: Microsoft-Login
+1. Azure Portal → App registrations → New (Konten: „Personal Microsoft accounts“ oder alle).
+   Redirect URI: `https://<projekt>.supabase.co/auth/v1/callback`.
+2. Client ID und Secret in Supabase unter Authentication → Providers → Azure eintragen.
+3. In Vercel `NEXT_PUBLIC_AUTH_MICROSOFT=true` setzen und neu deployen.
+
+## Lokal entwickeln
 ```bash
+cp .env.example .env.local   # Werte eintragen
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
