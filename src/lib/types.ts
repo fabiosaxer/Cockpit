@@ -27,6 +27,8 @@ export type Item = {
   due_date: string;
   /** Echte Frist bei kritischen Terminen; due_date liegt dann CRITICAL_BUFFER_DAYS davor */
   deadline?: string | null;
+  /** Auf die Heute-Liste gesetzt fuer diesen Tag */
+  planned_for?: string | null;
   lead_days: number | null;
   note: string | null;
   recur_every: number | null;

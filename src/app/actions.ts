@@ -412,3 +412,46 @@ export async function archiveModule(id: string) {
   if (error) throw new Error(error.message);
   refresh();
 }
+
+// ---------- Heute-Liste ----------
+
+/** Eintrag auf die Heute-Liste setzen oder wieder entfernen. */
+export async function setPlannedToday(id: string, plan: boolean) {
+  const { supabase } = await requireSession();
+  const { error } = await supabase
+    .from("items")
+    .update({ planned_for: plan ? todayISO() : null })
+    .eq("id", id);
+  if (error) throw new Error(error.message);
+  refresh();
+}
+
+/** Termin vorbereiten (Outlook oder Cockpit): Aufgabe "Vorbereiten: ..." fuer heute, faellig am Termin. */
+export async function prepareEvent(title: string, areaId: string, eventDate: string) {
+  const { supabase } = await requireSession();
+  const today = todayISO();
+  const prepTitle = `Vorbereiten: ${title}`;
+  // Gibt es die Vorbereitung schon (offen), wird sie nur auf heute gesetzt
+  const { data: existing } = await supabase
+    .from("items")
+    .select("id")
+    .eq("title", prepTitle)
+    .eq("area_id", areaId)
+    .is("done_at", null)
+    .limit(1);
+  if (existing?.length) {
+    await supabase.from("items").update({ planned_for: today }).eq("id", existing[0].id);
+    refresh();
+    return;
+  }
+  const { data: type } = await supabase.from("item_types").select("id").eq("name", "Aufgabe").maybeSingle();
+  const { error } = await supabase.from("items").insert({
+    title: prepTitle,
+    area_id: areaId,
+    type_id: type?.id ?? null,
+    due_date: eventDate < today ? today : eventDate,
+    planned_for: today,
+  });
+  if (error) throw new Error(error.message);
+  refresh();
+}

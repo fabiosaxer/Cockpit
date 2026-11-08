@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { completeItem } from "@/app/actions";
+import { completeItem, prepareEvent, setPlannedToday } from "@/app/actions";
 import { formatShort } from "@/lib/dates";
 import { countdown, recurLabel, type ClassifiedItem, type ItemState } from "@/lib/logic";
 import { AreaChip } from "./AreaChip";
+import { PlanButton } from "./PlanButton";
 import { DoneButton } from "./SubmitButton";
 
 export const STATE_STYLE: Record<ItemState, { text: string; pill: string; bar: string; label: string }> = {
@@ -28,6 +29,7 @@ export function ItemRow({
 }) {
   const s = STATE_STYLE[item.state];
   const recur = recurLabel(item.recur_every, item.recur_unit);
+  const planned = !!item.planned_for;
 
   // Termin aus Outlook: nur anzeigen, Bearbeiten in Outlook
   if (item.event) {
@@ -56,10 +58,16 @@ export function ItemRow({
         ) : (
           <div className="min-w-0 flex-1">{body}</div>
         )}
+        <form action={prepareEvent.bind(null, item.title, item.area_id, item.due_date)}>
+          <PlanButton active={false} label={`${item.title} vorbereiten`} />
+        </form>
         <span className={`chip shrink-0 tabular-nums ${s.pill}`}>{countdown(item.days)}</span>
       </li>
     );
   }
+
+  // Termine werden nicht selbst eingeplant, sondern bekommen eine Aufgabe "Vorbereiten: ..."
+  const isAppointment = typeName === "Termin";
 
   return (
     <li className="flex items-center gap-3 py-2.5">
@@ -83,6 +91,16 @@ export function ItemRow({
           </div>
         )}
       </Link>
+      {item.state !== "done" &&
+        (isAppointment ? (
+          <form action={prepareEvent.bind(null, item.title, item.area_id, item.due_date)}>
+            <PlanButton active={false} label={`${item.title} vorbereiten`} />
+          </form>
+        ) : (
+          <form action={setPlannedToday.bind(null, item.id, !planned)}>
+            <PlanButton active={planned} label={item.title} />
+          </form>
+        ))}
       <span className={`chip shrink-0 tabular-nums ${s.pill}`}>{countdown(item.days)}</span>
     </li>
   );
