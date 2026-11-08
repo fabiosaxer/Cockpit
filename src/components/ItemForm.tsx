@@ -2,7 +2,13 @@
 
 import { useState } from "react";
 import type { Area, Item, ItemType, Project } from "@/lib/types";
+import { addDays, formatShort, isISODate } from "@/lib/dates";
+import { CRITICAL_BUFFER_DAYS } from "@/lib/logic";
 import { SubmitButton } from "./SubmitButton";
+
+function shiftLabel(iso: string, days: number): string {
+  return isISODate(iso) ? formatShort(addDays(iso, days)) : "–";
+}
 
 export type ItemFormProps = {
   areas: Area[];
@@ -34,6 +40,8 @@ export function ItemForm({
   const [more, setMore] = useState(
     !!item && (item.lead_days != null || !!item.recur_every || !!item.note || !!item.project_id),
   );
+  const [critical, setCritical] = useState(!!item?.deadline);
+  const [deadline, setDeadline] = useState(item?.deadline ?? today);
   const typeLead = types.find((t) => t.id === typeId)?.lead_days ?? 0;
   const areaProjects = projects.filter((p) => p.area_id === areaId);
 
@@ -68,12 +76,40 @@ export function ItemForm({
         </label>
       </div>
 
-      <label className="block space-y-1">
-        <span className="label">Fällig am</span>
-        <input type="date" name="due_date" required defaultValue={item?.due_date ?? today} className="field" />
-        <span className="block font-mono text-[0.7rem] text-cyan">
-          Sichtbar ab {item?.lead_days ?? typeLead} Tagen vorher {item?.lead_days == null && "(Standard des Typs)"}
-        </span>
+      {critical ? (
+        <label className="block space-y-1">
+          <span className="label">Echte Frist</span>
+          <input
+            type="date"
+            name="deadline"
+            required
+            value={deadline}
+            onChange={(e) => setDeadline(e.target.value)}
+            className="field"
+          />
+          <span className="block text-xs font-semibold text-red">
+            Fällig eine Woche früher: {shiftLabel(deadline, -CRITICAL_BUFFER_DAYS)}
+          </span>
+        </label>
+      ) : (
+        <label className="block space-y-1">
+          <span className="label">Fällig am</span>
+          <input type="date" name="due_date" required defaultValue={item?.due_date ?? today} className="field" />
+          <span className="block font-mono text-[0.7rem] text-cyan">
+            Sichtbar ab {item?.lead_days ?? typeLead} Tagen vorher {item?.lead_days == null && "(Standard des Typs)"}
+          </span>
+        </label>
+      )}
+
+      <label className="flex items-center gap-2 text-sm font-semibold">
+        <input
+          type="checkbox"
+          name="critical"
+          checked={critical}
+          onChange={(e) => setCritical(e.target.checked)}
+          className="size-5 accent-[#f0505a]"
+        />
+        Kritisch: eine Woche vor der Frist fertig sein
       </label>
 
       <button type="button" onClick={() => setMore((m) => !m)} className="label text-cyan">

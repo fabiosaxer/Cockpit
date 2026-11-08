@@ -24,6 +24,8 @@ export type Item = {
   ipa_candidate_id?: string | null;
   title: string;
   due_date: string;
+  /** Echte Frist bei kritischen Terminen; due_date liegt dann CRITICAL_BUFFER_DAYS davor */
+  deadline?: string | null;
   lead_days: number | null;
   note: string | null;
   recur_every: number | null;

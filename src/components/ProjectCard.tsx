@@ -87,7 +87,10 @@ export function ProjectCard({
                 <div className={`truncate text-sm font-semibold ${m.done_at ? "text-dim line-through" : ""}`}>
                   {m.title}
                 </div>
-                <div className="text-xs text-dim">{formatShort(m.due_date)}</div>
+                <div className="text-xs text-dim">
+                  {formatShort(m.due_date)}
+                  {m.deadline && <span className="font-bold text-red"> · kritisch, Frist {formatShort(m.deadline)}</span>}
+                </div>
               </Link>
               {!m.done_at && <span className={`chip shrink-0 tabular-nums ${pill(days)}`}>{countdown(days)}</span>}
             </li>
@@ -95,10 +98,16 @@ export function ProjectCard({
         })}
       </ul>
 
-      <form action={createMilestone.bind(null, project.id)} className="mt-2 grid grid-cols-[1fr_8.5rem_auto] gap-2">
-        <input name="title" required placeholder="Neuer Meilenstein" className="field px-3 py-2 text-sm" />
-        <input type="date" name="due_date" required defaultValue={today} className="field px-2 py-2 text-sm" aria-label="Datum" />
-        <SubmitButton className="btn btn-primary px-3" pendingText="…">+</SubmitButton>
+      <form action={createMilestone.bind(null, project.id)} className="mt-2 space-y-2">
+        <div className="grid grid-cols-[1fr_8.5rem_auto] gap-2">
+          <input name="title" required placeholder="Neuer Meilenstein" className="field px-3 py-2 text-sm" />
+          <input type="date" name="due_date" required defaultValue={today} className="field px-2 py-2 text-sm" aria-label="Datum" />
+          <SubmitButton className="btn btn-primary px-3" pendingText="…">+</SubmitButton>
+        </div>
+        <label className="flex items-center gap-2 px-1 text-xs font-semibold text-dim">
+          <input type="checkbox" name="critical" className="size-4 accent-[#f0505a]" />
+          Kritisch: Datum ist die Frist, fällig eine Woche früher
+        </label>
       </form>
 
       <div className="mt-3 flex gap-2">

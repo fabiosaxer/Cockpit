@@ -74,6 +74,9 @@ export function ItemRow({
           {projectName ? <span className="truncate">· {projectName}</span> : typeName && <span>· {typeName}</span>}
           {recur && <span>· ↻ {recur}</span>}
         </div>
+        {item.deadline && (
+          <div className="mt-0.5 text-xs font-bold text-red">Kritisch · Frist {formatShort(item.deadline)}</div>
+        )}
         {item.conflict && (
           <div className="mt-0.5 text-xs font-bold text-magenta">
             Während oder kurz nach „{item.conflict.title}“ fällig

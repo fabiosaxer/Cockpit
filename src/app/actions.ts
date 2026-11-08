@@ -4,7 +4,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { shiftOutOfAbsences } from "@/lib/absences";
 import { requireSession } from "@/lib/data";
-import { addInterval, isISODate, todayISO } from "@/lib/dates";
+import { addDays, addInterval, isISODate, todayISO } from "@/lib/dates";
+import { CRITICAL_BUFFER_DAYS } from "@/lib/logic";
 import { ipaSchedule } from "@/lib/ipa";
 import type { Absence, Item, ProjectStatus, RecurUnit } from "@/lib/types";
 
@@ -43,12 +44,15 @@ function itemFields(fd: FormData) {
   const unit = str(fd, "recur_unit") as RecurUnit;
   const every = optInt(fd, "recur_every", 1);
   const recurring = every != null && RECUR_UNITS.includes(unit);
+  // Kritisch: Fälligkeit eine Woche vor der echten Frist
+  const deadline = fd.get("critical") === "on" ? optDate(fd, "deadline") : null;
   return {
     title,
     area_id: str(fd, "area_id"),
     type_id: optStr(fd, "type_id"),
     project_id: optStr(fd, "project_id"),
-    due_date: date(fd, "due_date"),
+    deadline,
+    due_date: deadline ? addDays(deadline, -CRITICAL_BUFFER_DAYS) : date(fd, "due_date"),
     lead_days: optInt(fd, "lead_days"),
     note: optStr(fd, "note"),
     recur_every: recurring ? every : null,
@@ -167,9 +171,12 @@ export async function createMilestone(projectId: string, fd: FormData) {
   const { data: project, error: pErr } = await supabase.from("projects").select("area_id").eq("id", projectId).single();
   if (pErr || !project) throw new Error(pErr?.message ?? "Projekt nicht gefunden");
   const { data: type } = await supabase.from("item_types").select("id").eq("name", "Projekt-Meilenstein").maybeSingle();
+  const given = date(fd, "due_date");
+  const critical = fd.get("critical") === "on";
   const { error } = await supabase.from("items").insert({
     title,
-    due_date: date(fd, "due_date"),
+    deadline: critical ? given : null,
+    due_date: critical ? addDays(given, -CRITICAL_BUFFER_DAYS) : given,
     area_id: project.area_id,
     project_id: projectId,
     type_id: type?.id ?? null,

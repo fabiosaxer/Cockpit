@@ -76,3 +76,6 @@ export function recurLabel(every: number | null, unit: RecurUnit | null): string
   const [single, plural] = UNIT_LABEL[unit];
   return every === 1 ? single : `alle ${every} ${plural}`;
 }
+
+/** Puffer fuer kritische Termine: faellig eine Woche vor der echten Frist. */
+export const CRITICAL_BUFFER_DAYS = 7;
