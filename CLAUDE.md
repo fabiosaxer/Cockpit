@@ -39,7 +39,8 @@ Bühler, Studium (ZHAW SML), IPA (Prüfungsexperte), SR-Verantwortlicher FC Zuzw
 - **Vorlauf:** Jeder Eintrag wird ab `faellig_am - vorlauf_tage` im Dashboard angezeigt. Standard pro Typ:
   Termin 0, Aufgabe 2, Projekt-Meilenstein 7, Abgabe Studium 14, Prüfung 28. IPA-Korrektur ist ab Abgabe sichtbar.
   Der Vorlauf ist pro Eintrag überschreibbar.
-- **Wiederholung:** Die nächste Fälligkeit wird ab dem Erledigt-Datum berechnet, nicht nach fixem Kalender.
+- **Wiederholung:** Nur im Haushalt (HOME) ab dem Erledigt-Datum. Sonst fixer Rhythmus ab der bisherigen Fälligkeit
+  (`nextDueDate` in `logic.ts`); Monatsende bleibt Monatsende.
 - **Abwesenheiten:** Wiederkehrende Aufgaben in einer Abwesenheit werden auf den ersten Tag danach verschoben.
   Fixe Fristen werden nicht verschoben, sondern markiert.
 - **IPA:** Aus Kürzel, Start und Ende werden Fixpunkte erzeugt: Validierungsgespräch (ca. 2 Arbeitstage vor Start),

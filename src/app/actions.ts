@@ -4,8 +4,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { shiftOutOfAbsences } from "@/lib/absences";
 import { requireSession } from "@/lib/data";
-import { addDays, addInterval, isISODate, todayISO } from "@/lib/dates";
-import { CRITICAL_BUFFER_DAYS } from "@/lib/logic";
+import { addDays, isISODate, todayISO } from "@/lib/dates";
+import { CRITICAL_BUFFER_DAYS, nextDueDate, RECUR_FROM_DONE_AREA } from "@/lib/logic";
 import { ipaSchedule } from "@/lib/ipa";
 import type { Absence, Item, ProjectStatus, RecurUnit } from "@/lib/types";
 
@@ -115,6 +115,8 @@ export async function completeItem(id: string) {
   if (upErr) throw new Error(upErr.message);
 
   if (item.recur_every && item.recur_unit) {
+    const { data: area } = await supabase.from("areas").select("code").eq("id", item.area_id).maybeSingle();
+    const fromDone = area?.code === RECUR_FROM_DONE_AREA;
     const { error: insErr } = await supabase.from("items").insert({
       area_id: item.area_id,
       type_id: item.type_id,
@@ -125,8 +127,9 @@ export async function completeItem(id: string) {
       lead_days: item.lead_days,
       recur_every: item.recur_every,
       recur_unit: item.recur_unit,
+      module_id: item.module_id ?? null,
       due_date: shiftOutOfAbsences(
-        addInterval(todayISO(), item.recur_every, item.recur_unit),
+        nextDueDate(item.due_date, item.recur_every, item.recur_unit, todayISO(), fromDone),
         await activeAbsences(supabase),
       ),
     });

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { Area, Item, ItemType, Project, StudyModule } from "@/lib/types";
 import { addDays, formatShort, isISODate } from "@/lib/dates";
-import { CRITICAL_BUFFER_DAYS } from "@/lib/logic";
+import { CRITICAL_BUFFER_DAYS, RECUR_FROM_DONE_AREA } from "@/lib/logic";
 import { SubmitButton } from "./SubmitButton";
 
 function shiftLabel(iso: string, days: number): string {
@@ -139,7 +139,11 @@ export function ItemForm({
             <input type="number" min={0} name="lead_days" inputMode="numeric" defaultValue={item?.lead_days ?? ""} className="field" />
           </label>
           <div className="space-y-1">
-            <span className="label">Wiederholen ab Erledigt-Datum</span>
+            <span className="label">
+              {areas.find((a) => a.id === areaId)?.code === RECUR_FROM_DONE_AREA
+                ? "Wiederholen ab Erledigt-Datum"
+                : "Wiederholen im festen Rhythmus ab Fälligkeit"}
+            </span>
             <div className="grid grid-cols-[5rem_1fr] gap-2">
               <input type="number" min={1} name="recur_every" inputMode="numeric" placeholder="–" defaultValue={item?.recur_every ?? ""} className="field" />
               <select name="recur_unit" defaultValue={item?.recur_unit ?? "week"} className="field">

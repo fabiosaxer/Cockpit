@@ -1,5 +1,5 @@
 import { absenceConflict } from "./absences";
-import { diffDays } from "./dates";
+import { addDays, addInterval, diffDays } from "./dates";
 import type { Absence, Item, ItemType, RecurUnit } from "./types";
 
 export type ItemState = "overdue" | "today" | "approach" | "later" | "done";
@@ -79,3 +79,41 @@ export function recurLabel(every: number | null, unit: RecurUnit | null): string
 
 /** Puffer fuer kritische Termine: faellig eine Woche vor der echten Frist. */
 export const CRITICAL_BUFFER_DAYS = 7;
+
+/** Bereich, in dem Wiederholungen ab dem Erledigt-Datum rechnen. Ueberall sonst gilt ein fixer Rhythmus. */
+export const RECUR_FROM_DONE_AREA = "HOME";
+
+function isMonthEnd(iso: string): boolean {
+  return addDays(iso, 1).slice(8, 10) === "01";
+}
+
+function toMonthEnd(iso: string): string {
+  // erster Tag des Folgemonats minus 1 Tag
+  const [y, m] = iso.split("-").map(Number);
+  const next = m === 12 ? `${y + 1}-01-01` : `${y}-${String(m + 1).padStart(2, "0")}-01`;
+  return addDays(next, -1);
+}
+
+/**
+ * Naechste Faelligkeit einer wiederkehrenden Aufgabe.
+ * fromDone: ab heute (Haushalt). Sonst fixer Rhythmus ab der bisherigen Faelligkeit,
+ * bis das Datum nicht mehr in der Vergangenheit liegt. Monatsende bleibt Monatsende (28.2. -> 29.2.).
+ */
+export function nextDueDate(
+  dueDate: string,
+  every: number,
+  unit: RecurUnit,
+  today: string,
+  fromDone: boolean,
+): string {
+  if (fromDone) return addInterval(today, every, unit);
+  const monthly = unit === "month" || unit === "year";
+  const keepEnd = monthly && isMonthEnd(dueDate);
+  let next = dueDate;
+  for (let i = 0; i < 1000; i++) {
+    next = addInterval(next, every, unit);
+    if (keepEnd) next = toMonthEnd(next);
+    if (next > today) break;
+  }
+  return next;
+}
