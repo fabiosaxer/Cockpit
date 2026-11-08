@@ -19,6 +19,7 @@ import {
   type QuotaStatus,
 } from "@/lib/quota";
 import type { RefereeQuota } from "@/lib/types";
+import { QuotaProgress } from "./QuotaProgress";
 import { SubmitButton } from "./SubmitButton";
 
 async function safeLoad(year: number) {
@@ -62,6 +63,9 @@ export async function QuotaSummary({ today }: { today: string }) {
         {b.onTrack > 0 && <span> · {b.onTrack} auf Kurs</span>}
         {b.paused > 0 && <span className="text-amber"> · {b.paused} SR pausiert</span>}
         {b.missingTeams > 0 && <span className="font-bold text-red"> · {b.missingTeams} fehlen</span>}
+      </span>
+      <span className="block pt-1">
+        <QuotaProgress secured={b.secured} onTrack={b.onTrack} target={b.target} compact />
       </span>
     </Link>
   );
@@ -115,31 +119,29 @@ export async function QuotaSection({ today, year }: { today: string; year: numbe
           </div>
         </div>
 
-        {/* Bilanz */}
-        <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-          <div className="rounded-xl bg-green/10 py-2">
-            <div className="text-2xl font-black text-green tabular-nums">{b.secured}</div>
-            <div className="label text-[0.6rem]">Gesichert</div>
-          </div>
-          <div className="rounded-xl bg-cyan/10 py-2">
-            <div className="text-2xl font-black text-cyan tabular-nums">+{b.onTrack}</div>
-            <div className="label text-[0.6rem]">Auf Kurs</div>
-          </div>
-          <form action={setSeasonTarget.bind(null, year)} className="rounded-xl bg-line/50 py-1.5">
-            <input
-              name="teams"
-              type="number"
-              min={0}
-              inputMode="numeric"
-              defaultValue={data.target ?? ""}
-              placeholder="–"
-              aria-label="Ziel Mannschaften"
-              className="w-14 rounded-lg bg-white text-center text-2xl font-black tabular-nums"
-            />
-            <SubmitButton className="label block w-full text-[0.6rem] text-cyan" pendingText="…">
-              Ziel ✓
-            </SubmitButton>
-          </form>
+        {/* Ziel und Fortschritt */}
+        <form action={setSeasonTarget.bind(null, year)} className="mt-3 flex items-center gap-2 px-1">
+          <label htmlFor={`target-${year}`} className="text-sm font-bold">
+            Ziel
+          </label>
+          <input
+            id={`target-${year}`}
+            name="teams"
+            type="number"
+            min={0}
+            inputMode="numeric"
+            defaultValue={data.target ?? ""}
+            placeholder="–"
+            className="field w-20 py-1.5 text-center font-black"
+          />
+          <span className="text-sm text-dim">Mannschaften</span>
+          <SubmitButton className="btn ml-auto px-3 py-1.5 text-xs" pendingText="…">
+            OK
+          </SubmitButton>
+        </form>
+
+        <div className="mt-4 px-1">
+          <QuotaProgress secured={b.secured} onTrack={b.onTrack} target={b.target} />
         </div>
 
         {b.target != null && (
