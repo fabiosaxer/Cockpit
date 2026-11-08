@@ -2,7 +2,7 @@ import Link from "next/link";
 import { areaColor } from "@/lib/areaColors";
 import { formatShort } from "@/lib/dates";
 import type { ClassifiedItem } from "@/lib/logic";
-import type { Area, ItemType, Project } from "@/lib/types";
+import type { Area, ItemType, Project, StudyModule } from "@/lib/types";
 import { ItemRow } from "./ItemRow";
 import { StatusLight } from "./StatusLight";
 
@@ -13,12 +13,14 @@ export function AreaTile({
   items,
   projects,
   types,
+  modules = [],
   extra,
 }: {
   area: Area;
   items: ClassifiedItem[];
   projects: Project[];
   types: ItemType[];
+  modules?: StudyModule[];
   extra?: React.ReactNode;
 }) {
   const active = items.filter((i) => i.state !== "later");
@@ -55,7 +57,10 @@ export function AreaTile({
                 key={i.id}
                 item={i}
                 typeName={typeName(i.type_id)}
-                projectName={projects.find((p) => p.id === i.project_id)?.title}
+                projectName={
+                  projects.find((p) => p.id === i.project_id)?.title ??
+                  modules.find((m) => m.id === i.module_id)?.name
+                }
               />
             ))}
           </ul>

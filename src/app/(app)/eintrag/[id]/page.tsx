@@ -16,18 +16,19 @@ export default async function EditItemPage({
   const { back: rawBack } = await searchParams;
   const back = rawBack && rawBack.startsWith("/") && !rawBack.startsWith("//") ? rawBack : "/";
 
-  const [item, { areas, types, projects, today }] = await Promise.all([loadItem(id), loadCockpit()]);
+  const [item, { areas, types, projects, modules, today }] = await Promise.all([loadItem(id), loadCockpit()]);
   if (!item) notFound();
 
   return (
     <div className="mx-auto max-w-lg space-y-4">
       <Link href={back} className="font-bold text-white">‹ Zurück</Link>
       <section className="instrument p-5 pt-4">
-        <h1 className="mb-4 px-1 text-lg font-black">✏️ Eintrag bearbeiten</h1>
+        <h1 className="mb-4 px-1 text-lg font-black">Eintrag bearbeiten</h1>
         <ItemForm
           areas={areas}
           types={types}
           projects={projects}
+          modules={modules}
           today={today}
           item={item}
           action={updateItem.bind(null, item.id)}

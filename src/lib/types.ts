@@ -20,6 +20,7 @@ export type Item = {
   area_id: string;
   type_id: string | null;
   project_id: string | null;
+  module_id?: string | null;
   parent_id: string | null;
   ipa_candidate_id?: string | null;
   title: string;
@@ -81,4 +82,11 @@ export type CalendarCategory = {
   area_id: string | null;
   lead_days: number;
   hidden: boolean;
+};
+
+export type StudyModule = {
+  id: string;
+  name: string;
+  semester: string | null;
+  sort: number;
 };

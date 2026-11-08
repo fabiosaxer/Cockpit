@@ -8,7 +8,7 @@ import { loadCockpit, loadOutlookItems } from "@/lib/data";
 import { classifyAll } from "@/lib/logic";
 
 export default async function CockpitPage() {
-  const { areas, types, items, projects, absences, milestones, today } = await loadCockpit();
+  const { areas, types, items, projects, absences, milestones, modules, today } = await loadCockpit();
   const outlook = await loadOutlookItems(areas);
   const all = classifyAll([...items, ...outlook.items], types, today, absences);
   const count = (s: string) => all.filter((i) => i.state === s).length;
@@ -30,6 +30,7 @@ export default async function CockpitPage() {
             items={all.filter((i) => i.area_id === area.id)}
             projects={projects.filter((p) => p.area_id === area.id)}
             types={types}
+            modules={modules}
             extra={area.code === "FCZ" ? <QuotaSummary today={today} /> : undefined}
           />
         ))}
@@ -52,7 +53,7 @@ export default async function CockpitPage() {
           </div>
         </section>
       )}
-      <QuickAdd areas={areas} types={types} projects={projects} today={today} />
+      <QuickAdd areas={areas} types={types} projects={projects} modules={modules} today={today} />
     </div>
   );
 }

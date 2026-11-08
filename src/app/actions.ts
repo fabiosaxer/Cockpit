@@ -51,6 +51,7 @@ function itemFields(fd: FormData) {
     area_id: str(fd, "area_id"),
     type_id: optStr(fd, "type_id"),
     project_id: optStr(fd, "project_id"),
+    module_id: optStr(fd, "module_id"),
     deadline,
     due_date: deadline ? addDays(deadline, -CRITICAL_BUFFER_DAYS) : date(fd, "due_date"),
     lead_days: optInt(fd, "lead_days"),
@@ -371,6 +372,39 @@ export async function saveCalendarCategory(fd: FormData) {
     },
     { onConflict: "user_id,category" },
   );
+  if (error) throw new Error(error.message);
+  refresh();
+}
+
+// ---------- Studium: Faecher ----------
+
+export async function createModule(fd: FormData) {
+  const { supabase } = await requireSession();
+  const name = str(fd, "name");
+  if (!name) return;
+  const { error } = await supabase
+    .from("study_modules")
+    .insert({ name, semester: optStr(fd, "semester"), sort: 100 });
+  if (error) throw new Error(error.message);
+  refresh();
+}
+
+export async function renameModule(id: string, fd: FormData) {
+  const { supabase } = await requireSession();
+  const name = str(fd, "name");
+  if (!name) return;
+  const { error } = await supabase.from("study_modules").update({ name }).eq("id", id);
+  if (error) throw new Error(error.message);
+  refresh();
+}
+
+/** Fach abschliessen (z.B. Semesterende): verschwindet aus Auswahl und Uebersicht. */
+export async function archiveModule(id: string) {
+  const { supabase } = await requireSession();
+  const { error } = await supabase
+    .from("study_modules")
+    .update({ archived_at: new Date().toISOString() })
+    .eq("id", id);
   if (error) throw new Error(error.message);
   refresh();
 }

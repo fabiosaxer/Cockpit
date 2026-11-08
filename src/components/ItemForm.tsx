@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { Area, Item, ItemType, Project } from "@/lib/types";
+import type { Area, Item, ItemType, Project, StudyModule } from "@/lib/types";
 import { addDays, formatShort, isISODate } from "@/lib/dates";
 import { CRITICAL_BUFFER_DAYS } from "@/lib/logic";
 import { SubmitButton } from "./SubmitButton";
@@ -14,6 +14,7 @@ export type ItemFormProps = {
   areas: Area[];
   types: ItemType[];
   projects: Project[];
+  modules?: StudyModule[];
   today: string;
   item?: Item;
   defaultAreaId?: string;
@@ -27,6 +28,7 @@ export function ItemForm({
   areas,
   types,
   projects,
+  modules = [],
   today,
   item,
   defaultAreaId,
@@ -75,6 +77,20 @@ export function ItemForm({
           </select>
         </label>
       </div>
+
+      {areas.find((a) => a.id === areaId)?.code === "ZHAW" && modules.length > 0 && (
+        <label className="block space-y-1">
+          <span className="label">Fach</span>
+          <select name="module_id" defaultValue={item?.module_id ?? ""} className="field">
+            <option value="">– kein Fach –</option>
+            {modules.map((m) => (
+              <option key={m.id} value={m.id}>
+                {m.name}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
 
       {critical ? (
         <label className="block space-y-1">

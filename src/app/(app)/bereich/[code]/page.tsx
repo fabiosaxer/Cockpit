@@ -4,6 +4,7 @@ import { createProject, restoreItem } from "@/app/actions";
 import { ItemRow, STATE_STYLE } from "@/components/ItemRow";
 import { ProjectCard } from "@/components/ProjectCard";
 import { IpaSection } from "@/components/IpaSection";
+import { ModulesSection } from "@/components/ModulesSection";
 import { QuickAdd } from "@/components/QuickAdd";
 import { QuotaSection } from "@/components/QuotaSection";
 import { SubmitButton } from "@/components/SubmitButton";
@@ -22,7 +23,7 @@ export default async function AreaPage({
 }) {
   const { code } = await params;
   const { jahr } = await searchParams;
-  const { areas, types, items, projects, absences, milestones, today } = await loadCockpit();
+  const { areas, types, items, projects, absences, milestones, modules, today } = await loadCockpit();
   const area = areas.find((a) => a.code.toLowerCase() === code.toLowerCase());
   if (!area) notFound();
 
@@ -40,6 +41,7 @@ export default async function AreaPage({
   const done = await loadDone(area.id);
   const typeName = (id: string | null) => types.find((t) => t.id === id)?.name;
   const projectName = (id: string | null) => projects.find((p) => p.id === id)?.title;
+  const moduleName = (id?: string | null) => modules.find((m) => m.id === id)?.name;
 
   return (
     <div className="space-y-5">
@@ -53,6 +55,7 @@ export default async function AreaPage({
 
       {area.code === "IPA" && <IpaSection today={today} />}
       {area.code === "FCZ" && <QuotaSection today={today} year={year} />}
+      {area.code === "ZHAW" && <ModulesSection modules={modules} items={all} />}
 
       <div className="grid gap-4 lg:grid-cols-[1fr_22rem]">
         <section className="instrument p-4 pt-3">
@@ -70,7 +73,13 @@ export default async function AreaPage({
                 </div>
                 <ul className="divide-y divide-line/60">
                   {list.map((i) => (
-                    <ItemRow key={i.id} item={i} typeName={typeName(i.type_id)} projectName={projectName(i.project_id)} back={back} />
+                    <ItemRow
+                      key={i.id}
+                      item={i}
+                      typeName={typeName(i.type_id)}
+                      projectName={projectName(i.project_id) ?? moduleName(i.module_id)}
+                      back={back}
+                    />
                   ))}
                 </ul>
               </div>
@@ -117,7 +126,14 @@ export default async function AreaPage({
         </aside>
       </div>
 
-      <QuickAdd areas={areas} types={types} projects={projects} today={today} defaultAreaId={area.id} />
+      <QuickAdd
+        areas={areas}
+        types={types}
+        projects={projects}
+        modules={modules}
+        today={today}
+        defaultAreaId={area.id}
+      />
     </div>
   );
 }

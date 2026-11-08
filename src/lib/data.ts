@@ -2,7 +2,7 @@ import "server-only";
 import { redirect } from "next/navigation";
 import { createClient } from "./supabase/server";
 import { addDays, todayISO } from "./dates";
-import type { Absence, Area, IpaCandidate, Item, ItemType, Project, Referee, RefereeQuota, CalendarCategory } from "./types";
+import type { Absence, Area, IpaCandidate, Item, ItemType, Project, Referee, RefereeQuota, CalendarCategory, StudyModule } from "./types";
 
 const DEFAULT_AREAS = [
   { code: "BUE", name: "Bühler", sort: 10 },
@@ -39,6 +39,7 @@ export type Cockpit = {
   absences: Absence[];
   /** Alle Meilensteine (offen und erledigt) aktiver Projekte */
   milestones: Item[];
+  modules: StudyModule[];
   today: string;
 };
 
@@ -53,13 +54,14 @@ export async function loadCockpit(): Promise<Cockpit> {
   }
 
   const today = todayISO();
-  const [areas, types, items, projects, absences, milestones] = await Promise.all([
+  const [areas, types, items, projects, absences, milestones, modules] = await Promise.all([
     supabase.from("areas").select("*").order("sort"),
     supabase.from("item_types").select("*").order("sort"),
     supabase.from("items").select("*").is("done_at", null).order("due_date"),
     supabase.from("projects").select("*").is("archived_at", null).order("created_at"),
     supabase.from("absences").select("*").gte("end_date", addDays(today, -3)).order("start_date"),
     supabase.from("items").select("*").not("project_id", "is", null).order("due_date"),
+    supabase.from("study_modules").select("*").is("archived_at", null).order("sort"),
   ]);
 
   for (const r of [areas, types, items, projects]) {
@@ -74,6 +76,7 @@ export async function loadCockpit(): Promise<Cockpit> {
     // Tabelle fehlt, solange die zweite Migration nicht ausgefuehrt ist: dann einfach leer
     absences: (absences.error ? [] : absences.data) as Absence[],
     milestones: (milestones.data ?? []) as Item[],
+    modules: (modules.error ? [] : modules.data) as StudyModule[],
     today,
   };
 }
