@@ -2,7 +2,7 @@ import "server-only";
 import { redirect } from "next/navigation";
 import { createClient } from "./supabase/server";
 import { addDays, todayISO } from "./dates";
-import type { Absence, Area, IpaCandidate, Item, ItemType, Project, Referee, RefereeQuota } from "./types";
+import type { Absence, Area, IpaCandidate, Item, ItemType, Project, Referee, RefereeQuota, CalendarCategory } from "./types";
 
 const DEFAULT_AREAS = [
   { code: "BUE", name: "Bühler", sort: 10 },
@@ -124,4 +124,31 @@ export async function loadItem(id: string): Promise<Item | null> {
   const { supabase } = await requireSession();
   const { data } = await supabase.from("items").select("*").eq("id", id).maybeSingle();
   return (data as Item) ?? null;
+}
+
+export type OutlookStatus = "off" | "disconnected" | "ok" | "relogin" | "error";
+
+/** Outlook-Termine als Eintraege. Fehler fuehren nie zum Absturz der Seite. */
+export async function loadOutlookItems(areas: Area[]): Promise<{ status: OutlookStatus; items: Item[] }> {
+  const { outlookConfigured, getAccessToken, fetchEvents, OutlookAuthError } = await import("./outlook");
+  const { eventsToItems } = await import("./events");
+  if (!outlookConfigured()) return { status: "off", items: [] };
+  const { supabase } = await requireSession();
+  try {
+    const token = await getAccessToken(supabase);
+    if (!token) return { status: "disconnected", items: [] };
+    const today = todayISO();
+    const [events, cats] = await Promise.all([
+      fetchEvents(token, today, addDays(today, 90)),
+      supabase.from("calendar_categories").select("*"),
+    ]);
+    const items = eventsToItems(events, (cats.data ?? []) as CalendarCategory[], areas).map((i) =>
+      // Mehrtaegige Termine, die vor heute begonnen haben, laufen heute noch
+      i.due_date < today ? { ...i, due_date: today } : i,
+    );
+    return { status: "ok", items };
+  } catch (e) {
+    console.error("Outlook:", e);
+    return { status: e instanceof OutlookAuthError ? "relogin" : "error", items: [] };
+  }
 }

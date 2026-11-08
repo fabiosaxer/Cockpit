@@ -55,7 +55,7 @@ export function classifyAll(
     .map((item) => {
       const lead = effectiveLead(item, types);
       const conflict =
-        !item.recur_every && item.due_date >= today ? absenceConflict(item.due_date, absences) : undefined;
+        !item.recur_every && !item.event && item.due_date >= today ? absenceConflict(item.due_date, absences) : undefined;
       return { ...item, lead, conflict, ...classify(item, lead, today) };
     })
     .sort(

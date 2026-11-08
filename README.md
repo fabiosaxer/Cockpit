@@ -8,7 +8,7 @@ Next.js 15 · Supabase · Vercel. Kontext für Claude Code steht in `CLAUDE.md`.
 
 ### 1. Supabase
 1. **SQL Editor** → die Dateien in `supabase/migrations/` der Reihe nach einfügen und ausführen (Run):
-   `20261107000000_init.sql`, `20261108000000_absences_ipa_referees.sql`, `20261108010000_ipa_profession_quota_toggle.sql`.
+   `20261107000000_init.sql`, `20261108000000_absences_ipa_referees.sql`, `20261108010000_ipa_profession_quota_toggle.sql`, `20261108020000_outlook.sql`.
 2. **Authentication → URL Configuration**
    - Site URL: `https://cockpit.saxer.sg`
    - Redirect URLs: `https://cockpit.saxer.sg/**`, `https://*.vercel.app/**`, `http://localhost:3000/**`
@@ -58,3 +58,13 @@ npm run dev
 ## Datenbank-Änderungen
 Neue Migrationen liegen in `supabase/migrations/`. Jede Datei einmal im Supabase **SQL Editor** ausführen,
 in der Reihenfolge des Dateinamens.
+
+## Outlook-Kalender (Microsoft 365)
+1. Entra Admin Center → App-Registrierungen → Neue Registrierung „Cockpit“, einzelner Mandant,
+   Umleitungs-URI (Web): `https://cockpit.saxer.sg/api/outlook/callback`.
+2. Geheimen Clientschlüssel erstellen (24 Monate, vor Ablauf erneuern).
+3. API-Berechtigungen (delegiert): `Calendars.ReadWrite`, `offline_access`, `User.Read`, Administratorzustimmung erteilen.
+4. Vercel-Variablen: `MS_TENANT_ID`, `MS_CLIENT_ID`, `MS_CLIENT_SECRET`, `TOKEN_ENCRYPTION_KEY` (lange Zufallszeichenkette).
+5. Im Cockpit unter Einstellungen „Mit Outlook verbinden“. Kategorien den Bereichen zuordnen.
+
+Tokens werden AES-256-GCM-verschlüsselt in Supabase gespeichert. Das Cockpit liest nur den eigenen Kalender.

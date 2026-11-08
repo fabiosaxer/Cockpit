@@ -48,6 +48,9 @@ Bühler, Studium (ZHAW SML), IPA (Prüfungsexperte), SR-Verantwortlicher FC Zuzw
 - **SR-Kontingent:** Kein Spielzähler. Pro Vereins-SR und Kalenderjahr wird nur markiert, ob das Kontingent
   (15 Spiele) erreicht ist. Jeder erreichte SR sichert 2 Mannschaften für die folgende Saison.
 - **Projekte:** Statusampel (grün, gelb, rot), nächster Schritt, Meilensteine.
+- **Outlook-Kalender:** Microsoft Graph, delegiert (nur eigener Kalender). Termine werden live geladen,
+  über die Outlook-Kategorie einem Bereich zugeordnet (`calendar_categories`) und wie Einträge mit Vorlauf angezeigt.
+  Nur lesend; Bearbeiten in Outlook. Code: `src/lib/outlook.ts`, `src/lib/events.ts`, `src/app/api/outlook/`.
 
 ## Daten- und Sicherheitsregeln
 

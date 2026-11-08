@@ -26,6 +26,39 @@ export function ItemRow({
 }) {
   const s = STATE_STYLE[item.state];
   const recur = recurLabel(item.recur_every, item.recur_unit);
+
+  // Termin aus Outlook: nur anzeigen, Bearbeiten in Outlook
+  if (item.event) {
+    const body = (
+      <>
+        <div className="truncate font-semibold">{item.title}</div>
+        <div className="flex items-center gap-1.5 truncate text-xs text-dim">
+          {areaCode && <AreaChip code={areaCode} />}
+          <span>{formatShort(item.due_date)}</span>
+          <span>· {item.event.time ? `${item.event.time} Uhr` : "ganztägig"}</span>
+          <span>· Outlook</span>
+        </div>
+      </>
+    );
+    return (
+      <li className="flex items-center gap-3 py-2.5">
+        <span className="grid size-7 shrink-0 place-items-center rounded-full bg-cyan/10 text-cyan" aria-hidden="true">
+          <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <path d="M7 3v3M17 3v3M4 8h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" />
+          </svg>
+        </span>
+        {item.event.webLink ? (
+          <a href={item.event.webLink} target="_blank" rel="noreferrer" className="min-w-0 flex-1">
+            {body}
+          </a>
+        ) : (
+          <div className="min-w-0 flex-1">{body}</div>
+        )}
+        <span className={`chip shrink-0 tabular-nums ${s.pill}`}>{countdown(item.days)}</span>
+      </li>
+    );
+  }
+
   return (
     <li className="flex items-center gap-3 py-2.5">
       <form action={completeItem.bind(null, item.id)}>

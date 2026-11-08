@@ -3,18 +3,24 @@ import { AreaTile } from "@/components/AreaTile";
 import { QuickAdd } from "@/components/QuickAdd";
 import { QuotaSummary } from "@/components/QuotaSection";
 import { StatusBar } from "@/components/StatusBar";
-import { loadCockpit } from "@/lib/data";
+import { loadCockpit, loadOutlookItems } from "@/lib/data";
 import { classifyAll } from "@/lib/logic";
 
 export default async function CockpitPage() {
   const { areas, types, items, projects, absences, today } = await loadCockpit();
-  const all = classifyAll(items, types, today, absences);
+  const outlook = await loadOutlookItems(areas);
+  const all = classifyAll([...items, ...outlook.items], types, today, absences);
   const count = (s: string) => all.filter((i) => i.state === s).length;
 
   return (
     <div className="space-y-4">
       <StatusBar overdue={count("overdue")} today={count("today")} approach={count("approach")} />
       <AbsenceBanner absences={absences} today={today} />
+      {(outlook.status === "relogin" || outlook.status === "error") && (
+        <a href="/einstellungen" className="instrument block px-4 py-3 text-sm font-semibold text-red">
+          Outlook-Termine konnten nicht geladen werden. Zu den Einstellungen ›
+        </a>
+      )}
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {areas.map((area) => (
           <AreaTile

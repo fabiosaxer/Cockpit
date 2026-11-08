@@ -332,3 +332,31 @@ export async function setRefereeQuota(refereeId: string, year: number, reached: 
   if (error) throw new Error(error.message);
   refresh();
 }
+
+// ---------- Outlook ----------
+
+export async function disconnectOutlook() {
+  const { supabase } = await requireSession();
+  const { error } = await supabase.from("oauth_tokens").delete().not("user_id", "is", null);
+  if (error) throw new Error(error.message);
+  refresh();
+}
+
+/** Zuordnung einer Outlook-Kategorie zu einem Bereich speichern. */
+export async function saveCalendarCategory(fd: FormData) {
+  const { supabase } = await requireSession();
+  const { data: auth } = await supabase.auth.getUser();
+  const areaId = str(fd, "area_id");
+  const { error } = await supabase.from("calendar_categories").upsert(
+    {
+      user_id: auth.user?.id,
+      category: str(fd, "category"),
+      area_id: areaId && areaId !== "hidden" ? areaId : null,
+      hidden: areaId === "hidden",
+      lead_days: optInt(fd, "lead_days") ?? 0,
+    },
+    { onConflict: "user_id,category" },
+  );
+  if (error) throw new Error(error.message);
+  refresh();
+}

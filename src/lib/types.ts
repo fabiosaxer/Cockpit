@@ -29,6 +29,8 @@ export type Item = {
   recur_every: number | null;
   recur_unit: RecurUnit | null;
   done_at: string | null;
+  /** Gesetzt bei Terminen aus Outlook (nur lesend) */
+  event?: { time: string | null; webLink: string | null };
 };
 
 export type Project = {
@@ -69,4 +71,12 @@ export type RefereeQuota = {
   referee_id: string;
   year: number;
   reached: boolean;
+};
+
+export type CalendarCategory = {
+  id: string;
+  category: string;
+  area_id: string | null;
+  lead_days: number;
+  hidden: boolean;
 };

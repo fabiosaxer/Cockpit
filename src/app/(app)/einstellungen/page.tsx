@@ -1,14 +1,22 @@
 import { createType, renameArea, updateTypeLead } from "@/app/actions";
+import { OutlookSettings } from "@/components/OutlookSettings";
 import { SubmitButton } from "@/components/SubmitButton";
 import { loadCockpit, requireSession } from "@/lib/data";
 
-export default async function SettingsPage() {
+export default async function SettingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ outlook?: string; grund?: string }>;
+}) {
+  const { outlook, grund } = await searchParams;
   const { areas, types } = await loadCockpit();
   const { user } = await requireSession();
 
   return (
     <div className="max-w-xl space-y-5">
       <h1 className="text-2xl font-black text-white drop-shadow-[0_1px_2px_rgba(10,60,110,0.35)]">Einstellungen</h1>
+
+      <OutlookSettings areas={areas} message={outlook} reason={grund} />
 
       <section className="instrument p-4 pt-3">
         <h2 className="label px-2">Typen & Vorlauf (Tage)</h2>

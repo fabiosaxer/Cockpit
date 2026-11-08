@@ -7,7 +7,7 @@ import { IpaSection } from "@/components/IpaSection";
 import { QuickAdd } from "@/components/QuickAdd";
 import { QuotaSection } from "@/components/QuotaSection";
 import { SubmitButton } from "@/components/SubmitButton";
-import { loadCockpit, loadDone } from "@/lib/data";
+import { loadCockpit, loadDone, loadOutlookItems } from "@/lib/data";
 import { areaColor } from "@/lib/areaColors";
 import { classifyAll, type ItemState } from "@/lib/logic";
 
@@ -27,7 +27,13 @@ export default async function AreaPage({
   if (!area) notFound();
 
   const back = `/bereich/${area.code}`;
-  const all = classifyAll(items.filter((i) => i.area_id === area.id), types, today, absences);
+  const outlook = await loadOutlookItems(areas);
+  const all = classifyAll(
+    [...items, ...outlook.items].filter((i) => i.area_id === area.id),
+    types,
+    today,
+    absences,
+  );
   const currentYear = Number(today.slice(0, 4));
   const year = Math.min(currentYear, Number(jahr) || currentYear);
   const areaProjects = projects.filter((p) => p.area_id === area.id);
