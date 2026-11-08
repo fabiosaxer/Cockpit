@@ -63,7 +63,7 @@ in der Reihenfolge des Dateinamens.
 1. Entra Admin Center → App-Registrierungen → Neue Registrierung „Cockpit“, einzelner Mandant,
    Umleitungs-URI (Web): `https://cockpit.saxer.sg/api/outlook/callback`.
 2. Geheimen Clientschlüssel erstellen (24 Monate, vor Ablauf erneuern).
-3. API-Berechtigungen (delegiert): `Calendars.ReadWrite`, `offline_access`, `User.Read`, Administratorzustimmung erteilen.
+3. API-Berechtigungen (delegiert): `Calendars.Read`, `offline_access`, `User.Read`, Administratorzustimmung erteilen.
 4. Vercel-Variablen: `MS_TENANT_ID`, `MS_CLIENT_ID`, `MS_CLIENT_SECRET`, `TOKEN_ENCRYPTION_KEY` (lange Zufallszeichenkette).
 5. Im Cockpit unter Einstellungen „Mit Outlook verbinden“. Kategorien den Bereichen zuordnen.
 

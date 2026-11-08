@@ -53,7 +53,7 @@ Bühler, Studium (ZHAW SML), IPA (Prüfungsexperte), SR-Verantwortlicher FC Zuzw
   `next_milestone` in `projects` werden nicht mehr verwendet.
 - **Studium:** Fächer in `study_modules` (pro Semester, archivierbar). Einträge im Bereich ZHAW haben optional `module_id`.
 - **Kritische Termine:** `items.deadline` = echte Frist, `due_date` = Frist minus 7 Tage (`CRITICAL_BUFFER_DAYS`).
-- **Outlook-Kalender:** Microsoft Graph, delegiert (nur eigener Kalender). Termine werden live geladen,
+- **Outlook-Kalender:** Microsoft Graph, delegiert, nur `Calendars.Read` (nur eigener Kalender, nie schreiben). Termine werden live geladen,
   über die Outlook-Kategorie einem Bereich zugeordnet (`calendar_categories`) und wie Einträge mit Vorlauf angezeigt.
   Pro Kategorie `in_timeline` (aus = nicht im Zeitstrahl, z.B. Lektionen). Nur lesend; Bearbeiten in Outlook. Code: `src/lib/outlook.ts`, `src/lib/events.ts`, `src/app/api/outlook/`.
 

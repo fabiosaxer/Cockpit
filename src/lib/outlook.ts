@@ -1,7 +1,7 @@
 import "server-only";
 import { decrypt, encrypt } from "./crypto";
 
-const SCOPES = "offline_access User.Read Calendars.ReadWrite";
+const SCOPES = "offline_access User.Read Calendars.Read";
 const GRAPH = "https://graph.microsoft.com/v1.0";
 
 type Supabase = Awaited<ReturnType<typeof import("./supabase/server").createClient>>;
