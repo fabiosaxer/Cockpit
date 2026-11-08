@@ -40,10 +40,12 @@ export function Greeting() {
   useEffect(() => {
     const update = () =>
       setHour(
-        Number(
-          new Intl.DateTimeFormat("de-CH", { hour: "numeric", hour12: false, timeZone: "Europe/Zurich" }).format(
+        // en-GB liefert die reine Zahl ("02"); de-CH wuerde "2 Uhr" liefern
+        Number.parseInt(
+          new Intl.DateTimeFormat("en-GB", { hour: "2-digit", hourCycle: "h23", timeZone: "Europe/Zurich" }).format(
             new Date(),
           ),
+          10,
         ),
       );
     update();
