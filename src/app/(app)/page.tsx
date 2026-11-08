@@ -12,7 +12,8 @@ export default async function CockpitPage() {
   const { areas, types, items, projects, absences, milestones, modules, today } = await loadCockpit();
   const outlook = await loadOutlookItems(areas);
   const all = classifyAll([...items, ...outlook.items], types, today, absences);
-  const count = (s: string) => all.filter((i) => i.state === s).length;
+  // Ruhige Termine (z.B. Lektionen) zaehlen nicht in der Lagezeile
+  const count = (s: string) => all.filter((i) => i.state === s && !i.event?.quiet).length;
 
   return (
     <div className="space-y-4">

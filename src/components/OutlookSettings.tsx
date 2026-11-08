@@ -57,9 +57,9 @@ export async function OutlookSettings({ areas, message, reason }: { areas: Area[
     }
   }
 
-  const rows: { category: string; area_id: string | null; lead_days: number; hidden: boolean }[] = [
+  const rows: { category: string; area_id: string | null; lead_days: number; hidden: boolean; in_timeline?: boolean }[] = [
     ...cats,
-    ...discovered.map((c) => ({ category: c, area_id: null, lead_days: 0, hidden: false })),
+    ...discovered.map((c) => ({ category: c, area_id: null, lead_days: 0, hidden: false, in_timeline: true })),
   ].sort((a, b) => (a.category === "" ? 1 : b.category === "" ? -1 : a.category.localeCompare(b.category)));
 
   return (
@@ -93,38 +93,51 @@ export async function OutlookSettings({ areas, message, reason }: { areas: Area[
       {tokenRow && rows.length > 0 && (
         <div className="space-y-2 border-t border-line pt-3">
           <p className="px-1 text-xs text-dim">
-            Jede Outlook-Kategorie landet in einem Bereich. Vorlauf = so viele Tage vorher unter „Demnächst“ sichtbar.
+            Jede Outlook-Kategorie landet in einem Bereich. Die Zahl ist der Vorlauf in Tagen. „Im Zeitstrahl“ aus: Termine erscheinen nur in der Bereichskachel (z.B. Lektionen).
           </p>
           <ul className="space-y-2">
             {rows.map((r) => (
               <li key={r.category || "_none"}>
-                <form action={saveCalendarCategory} className="grid grid-cols-[1fr_1fr_3.5rem_auto] items-center gap-2">
+                <form action={saveCalendarCategory} className="space-y-1.5 rounded-xl border border-line p-2.5">
                   <input type="hidden" name="category" value={r.category} />
-                  <span className="truncate text-sm font-semibold">{r.category || "Ohne Kategorie"}</span>
-                  <select
-                    name="area_id"
-                    defaultValue={r.hidden ? "hidden" : (r.area_id ?? "")}
-                    className="field px-2 py-2 text-sm"
-                    aria-label="Bereich"
-                  >
-                    {!r.area_id && !r.hidden && <option value="">– wählen –</option>}
-                    {areas.map((a) => (
-                      <option key={a.id} value={a.id}>
-                        {a.name}
-                      </option>
-                    ))}
-                    <option value="hidden">Ausblenden</option>
-                  </select>
-                  <input
-                    name="lead_days"
-                    type="number"
-                    min={0}
-                    inputMode="numeric"
-                    defaultValue={r.lead_days}
-                    className="field px-2 py-2 text-sm"
-                    aria-label="Vorlauf in Tagen"
-                  />
-                  <SubmitButton className="btn px-3 py-2 text-xs">OK</SubmitButton>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="truncate text-sm font-bold">{r.category || "Ohne Kategorie"}</span>
+                    <label className="flex shrink-0 items-center gap-1.5 text-xs font-semibold text-dim">
+                      <input
+                        type="checkbox"
+                        name="in_timeline"
+                        defaultChecked={r.in_timeline !== false}
+                        className="size-4 accent-[#0b8ad6]"
+                      />
+                      Im Zeitstrahl
+                    </label>
+                  </div>
+                  <div className="grid grid-cols-[1fr_3.5rem_auto] items-center gap-2">
+                    <select
+                      name="area_id"
+                      defaultValue={r.hidden ? "hidden" : (r.area_id ?? "")}
+                      className="field px-2 py-2 text-sm"
+                      aria-label="Bereich"
+                    >
+                      {!r.area_id && !r.hidden && <option value="">– Bereich wählen –</option>}
+                      {areas.map((a) => (
+                        <option key={a.id} value={a.id}>
+                          {a.name}
+                        </option>
+                      ))}
+                      <option value="hidden">Ausblenden</option>
+                    </select>
+                    <input
+                      name="lead_days"
+                      type="number"
+                      min={0}
+                      inputMode="numeric"
+                      defaultValue={r.lead_days}
+                      className="field px-2 py-2 text-sm"
+                      aria-label="Vorlauf in Tagen"
+                    />
+                    <SubmitButton className="btn px-3 py-2 text-xs">OK</SubmitButton>
+                  </div>
                 </form>
               </li>
             ))}

@@ -55,7 +55,7 @@ Bühler, Studium (ZHAW SML), IPA (Prüfungsexperte), SR-Verantwortlicher FC Zuzw
 - **Kritische Termine:** `items.deadline` = echte Frist, `due_date` = Frist minus 7 Tage (`CRITICAL_BUFFER_DAYS`).
 - **Outlook-Kalender:** Microsoft Graph, delegiert (nur eigener Kalender). Termine werden live geladen,
   über die Outlook-Kategorie einem Bereich zugeordnet (`calendar_categories`) und wie Einträge mit Vorlauf angezeigt.
-  Nur lesend; Bearbeiten in Outlook. Code: `src/lib/outlook.ts`, `src/lib/events.ts`, `src/app/api/outlook/`.
+  Pro Kategorie `in_timeline` (aus = nicht im Zeitstrahl, z.B. Lektionen). Nur lesend; Bearbeiten in Outlook. Code: `src/lib/outlook.ts`, `src/lib/events.ts`, `src/app/api/outlook/`.
 
 ## Daten- und Sicherheitsregeln
 

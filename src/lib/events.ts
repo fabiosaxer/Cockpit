@@ -50,7 +50,11 @@ export function eventsToItems(events: EventInput[], categories: CalendarCategory
       recur_every: null,
       recur_unit: null,
       done_at: null,
-      event: { time: e.isAllDay ? null : e.start.dateTime.slice(11, 16), webLink: e.webLink },
+      event: {
+        time: e.isAllDay ? null : e.start.dateTime.slice(11, 16),
+        webLink: e.webLink,
+        quiet: rule?.in_timeline === false,
+      },
     });
   }
   return items;

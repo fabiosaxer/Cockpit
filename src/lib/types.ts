@@ -33,7 +33,7 @@ export type Item = {
   recur_unit: RecurUnit | null;
   done_at: string | null;
   /** Gesetzt bei Terminen aus Outlook (nur lesend) */
-  event?: { time: string | null; webLink: string | null };
+  event?: { time: string | null; webLink: string | null; /** nicht im Zeitstrahl, z.B. Lektionen */ quiet?: boolean };
 };
 
 export type Project = {
@@ -82,6 +82,7 @@ export type CalendarCategory = {
   area_id: string | null;
   lead_days: number;
   hidden: boolean;
+  in_timeline?: boolean;
 };
 
 export type StudyModule = {

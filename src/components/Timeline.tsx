@@ -36,7 +36,8 @@ function Pill({ item, code }: { item: ClassifiedItem; code: string }) {
 }
 
 /** Zeitstrahl ueber die naechsten 14 Tage, alle Bereiche gemeinsam, unabhaengig vom Vorlauf. */
-export function Timeline({ items, areas, today }: { items: ClassifiedItem[]; areas: Area[]; today: string }) {
+export function Timeline({ items: allItems, areas, today }: { items: ClassifiedItem[]; areas: Area[]; today: string }) {
+  const items = allItems.filter((i) => !i.event?.quiet);
   const code = (areaId: string) => areas.find((a) => a.id === areaId)?.code ?? "";
   const end = addDays(today, DAYS - 1);
   const overdue = items.filter((i) => i.state === "overdue");

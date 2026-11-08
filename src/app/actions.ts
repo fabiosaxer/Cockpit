@@ -371,6 +371,7 @@ export async function saveCalendarCategory(fd: FormData) {
       category: str(fd, "category"),
       area_id: areaId && areaId !== "hidden" ? areaId : null,
       hidden: areaId === "hidden",
+      in_timeline: fd.get("in_timeline") === "on",
       lead_days: optInt(fd, "lead_days") ?? 0,
     },
     { onConflict: "user_id,category" },
