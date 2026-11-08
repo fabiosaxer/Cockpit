@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { createItem } from "@/app/actions";
 import { ItemForm, type ItemFormProps } from "./ItemForm";
 
@@ -15,6 +16,16 @@ export function QuickAdd(props: Omit<ItemFormProps, "action" | "submitLabel">) {
     setKey((k) => k + 1);
   }
 
+  // Hintergrund nicht mitscrollen, solange das Formular offen ist
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+
   return (
     <>
       <button
@@ -26,22 +37,33 @@ export function QuickAdd(props: Omit<ItemFormProps, "action" | "submitLabel">) {
         +
       </button>
 
-      {open && (
-        <div className="fixed inset-0 z-40 flex items-end justify-center bg-[#0b3a63]/40 backdrop-blur-sm sm:items-center" onClick={() => setOpen(false)}>
+      {/* Ueber ein Portal direkt in <body>, damit nichts (z.B. die Navigation) darueber liegt */}
+      {open &&
+        createPortal(
           <div
-            className="instrument max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-b-none p-5 sm:rounded-b-[22px] pb-[calc(1.25rem+env(safe-area-inset-bottom))]"
-            onClick={(e) => e.stopPropagation()}
+            className="fixed inset-0 z-[100] flex items-end justify-center bg-[#0b3a63]/40 backdrop-blur-sm sm:items-center"
+            onClick={() => setOpen(false)}
           >
-            <div className="mb-4 flex items-center justify-between px-2">
-              <span className="text-lg font-black">Neuer Eintrag</span>
-              <button type="button" onClick={() => setOpen(false)} className="label" aria-label="Schliessen">
-                ✕
-              </button>
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-label="Neuer Eintrag"
+              className="instrument flex max-h-[92dvh] w-full max-w-lg flex-col rounded-b-none sm:rounded-b-[22px]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between px-6 pt-5 pb-3">
+                <span className="text-lg font-black">Neuer Eintrag</span>
+                <button type="button" onClick={() => setOpen(false)} className="label p-1" aria-label="Schliessen">
+                  ✕
+                </button>
+              </div>
+              <div className="overflow-y-auto overscroll-contain px-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
+                <ItemForm key={key} {...props} action={submit} submitLabel="Eintragen" autoFocus stickySubmit />
+              </div>
             </div>
-            <ItemForm key={key} {...props} action={submit} submitLabel="Eintragen" autoFocus />
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
     </>
   );
 }

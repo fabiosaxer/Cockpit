@@ -22,6 +22,8 @@ export type ItemFormProps = {
   submitLabel: string;
   back?: string;
   autoFocus?: boolean;
+  /** Speichern-Knopf am unteren Rand festhalten (im scrollenden Dialog) */
+  stickySubmit?: boolean;
 };
 
 export function ItemForm({
@@ -36,6 +38,7 @@ export function ItemForm({
   submitLabel,
   back,
   autoFocus,
+  stickySubmit,
 }: ItemFormProps) {
   const [areaId, setAreaId] = useState(item?.area_id ?? defaultAreaId ?? areas[0]?.id ?? "");
   const [typeId, setTypeId] = useState(item?.type_id ?? types.find((t) => t.name === "Aufgabe")?.id ?? "");
@@ -174,9 +177,17 @@ export function ItemForm({
         </div>
       )}
 
-      <SubmitButton className="btn btn-primary w-full" pendingText="Speichere…">
-        {submitLabel}
-      </SubmitButton>
+      <div
+        className={
+          stickySubmit
+            ? "sticky bottom-0 -mx-5 bg-gradient-to-t from-white via-white to-white/0 px-5 pt-4 pb-1"
+            : ""
+        }
+      >
+        <SubmitButton className="btn btn-primary w-full" pendingText="Speichere…">
+          {submitLabel}
+        </SubmitButton>
+      </div>
     </form>
   );
 }
