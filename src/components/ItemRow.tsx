@@ -16,11 +16,13 @@ export const STATE_STYLE: Record<ItemState, { text: string; pill: string; bar: s
 export function ItemRow({
   item,
   typeName,
+  projectName,
   areaCode,
   back = "/",
 }: {
   item: ClassifiedItem;
   typeName?: string;
+  projectName?: string;
   areaCode?: string;
   back?: string;
 }) {
@@ -69,7 +71,7 @@ export function ItemRow({
         <div className="flex items-center gap-1.5 truncate text-xs text-dim">
           {areaCode && <AreaChip code={areaCode} />}
           <span>{formatShort(item.due_date)}</span>
-          {typeName && <span>· {typeName}</span>}
+          {projectName ? <span className="truncate">· {projectName}</span> : typeName && <span>· {typeName}</span>}
           {recur && <span>· ↻ {recur}</span>}
         </div>
         {item.conflict && (

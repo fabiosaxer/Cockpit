@@ -51,7 +51,12 @@ export function AreaTile({
         {shown.length ? (
           <ul className="divide-y divide-line">
             {shown.map((i) => (
-              <ItemRow key={i.id} item={i} typeName={typeName(i.type_id)} />
+              <ItemRow
+                key={i.id}
+                item={i}
+                typeName={typeName(i.type_id)}
+                projectName={projects.find((p) => p.id === i.project_id)?.title}
+              />
             ))}
           </ul>
         ) : (

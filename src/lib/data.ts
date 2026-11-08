@@ -37,6 +37,8 @@ export type Cockpit = {
   items: Item[];
   projects: Project[];
   absences: Absence[];
+  /** Alle Meilensteine (offen und erledigt) aktiver Projekte */
+  milestones: Item[];
   today: string;
 };
 
@@ -51,12 +53,13 @@ export async function loadCockpit(): Promise<Cockpit> {
   }
 
   const today = todayISO();
-  const [areas, types, items, projects, absences] = await Promise.all([
+  const [areas, types, items, projects, absences, milestones] = await Promise.all([
     supabase.from("areas").select("*").order("sort"),
     supabase.from("item_types").select("*").order("sort"),
     supabase.from("items").select("*").is("done_at", null).order("due_date"),
     supabase.from("projects").select("*").is("archived_at", null).order("created_at"),
     supabase.from("absences").select("*").gte("end_date", addDays(today, -3)).order("start_date"),
+    supabase.from("items").select("*").not("project_id", "is", null).order("due_date"),
   ]);
 
   for (const r of [areas, types, items, projects]) {
@@ -70,6 +73,7 @@ export async function loadCockpit(): Promise<Cockpit> {
     projects: projects.data as Project[],
     // Tabelle fehlt, solange die zweite Migration nicht ausgefuehrt ist: dann einfach leer
     absences: (absences.error ? [] : absences.data) as Absence[],
+    milestones: (milestones.data ?? []) as Item[],
     today,
   };
 }

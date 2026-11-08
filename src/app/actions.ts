@@ -145,28 +145,35 @@ export async function createProject(fd: FormData) {
   const { supabase } = await requireSession();
   const title = str(fd, "title");
   if (!title) throw new Error("Titel fehlt");
-  const { error } = await supabase.from("projects").insert({
-    title,
-    area_id: str(fd, "area_id"),
-    next_step: optStr(fd, "next_step"),
-    next_milestone: optDate(fd, "next_milestone"),
-  });
+  const { error } = await supabase.from("projects").insert({ title, area_id: str(fd, "area_id") });
   if (error) throw new Error(error.message);
   refresh();
 }
 
 export async function updateProject(id: string, fd: FormData) {
   const { supabase } = await requireSession();
-  const status = str(fd, "status") as ProjectStatus;
-  const { error } = await supabase
-    .from("projects")
-    .update({
-      title: str(fd, "title") || undefined,
-      status: STATUSES.includes(status) ? status : undefined,
-      next_step: optStr(fd, "next_step"),
-      next_milestone: optDate(fd, "next_milestone"),
-    })
-    .eq("id", id);
+  const title = str(fd, "title");
+  if (!title) return;
+  const { error } = await supabase.from("projects").update({ title }).eq("id", id);
+  if (error) throw new Error(error.message);
+  refresh();
+}
+
+/** Meilenstein = Eintrag vom Typ "Projekt-Meilenstein", verknuepft mit dem Projekt. */
+export async function createMilestone(projectId: string, fd: FormData) {
+  const { supabase } = await requireSession();
+  const title = str(fd, "title");
+  if (!title) throw new Error("Titel fehlt");
+  const { data: project, error: pErr } = await supabase.from("projects").select("area_id").eq("id", projectId).single();
+  if (pErr || !project) throw new Error(pErr?.message ?? "Projekt nicht gefunden");
+  const { data: type } = await supabase.from("item_types").select("id").eq("name", "Projekt-Meilenstein").maybeSingle();
+  const { error } = await supabase.from("items").insert({
+    title,
+    due_date: date(fd, "due_date"),
+    area_id: project.area_id,
+    project_id: projectId,
+    type_id: type?.id ?? null,
+  });
   if (error) throw new Error(error.message);
   refresh();
 }

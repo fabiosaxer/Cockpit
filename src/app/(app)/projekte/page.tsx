@@ -6,7 +6,7 @@ import { loadCockpit } from "@/lib/data";
 const ORDER = { red: 0, amber: 1, green: 2 } as const;
 
 export default async function ProjectsPage() {
-  const { areas, projects, today } = await loadCockpit();
+  const { areas, projects, milestones, today } = await loadCockpit();
   const sorted = [...projects].sort((a, b) => ORDER[a.status] - ORDER[b.status]);
   const code = (id: string) => areas.find((a) => a.id === id)?.code;
 
@@ -19,27 +19,29 @@ export default async function ProjectsPage() {
       )}
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {sorted.map((p) => (
-          <ProjectCard key={p.id} project={p} areaCode={code(p.area_id)} today={today} />
+          <ProjectCard
+            key={p.id}
+            project={p}
+            milestones={milestones.filter((m) => m.project_id === p.id)}
+            areaCode={code(p.area_id)}
+            today={today}
+          />
         ))}
       </div>
 
-      <details className="instrument max-w-lg p-4 pt-3">
-        <summary className="label cursor-pointer px-2 text-cyan">+ Projekt hinzufügen</summary>
+      <details className="instrument max-w-lg p-4" open={sorted.length === 0}>
+        <summary className="cursor-pointer px-1 text-sm font-bold text-cyan">+ Projekt hinzufügen</summary>
         <form action={createProject} className="mt-3 space-y-3">
           <input name="title" required placeholder="Projekttitel" className="field" />
           <select name="area_id" className="field" aria-label="Bereich">
             {areas.map((a) => (
               <option key={a.id} value={a.id}>
-                {a.code} · {a.name}
+                {a.name}
               </option>
             ))}
           </select>
-          <input name="next_step" placeholder="Nächster Schritt" className="field" />
-          <label className="block space-y-1">
-            <span className="label">Nächster Meilenstein</span>
-            <input type="date" name="next_milestone" className="field" />
-          </label>
           <SubmitButton className="btn btn-primary w-full">Anlegen</SubmitButton>
+          <p className="text-xs text-dim">Meilensteine fügst du danach direkt in der Projektkarte hinzu.</p>
         </form>
       </details>
     </div>

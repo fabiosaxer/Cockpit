@@ -47,7 +47,9 @@ Bühler, Studium (ZHAW SML), IPA (Prüfungsexperte), SR-Verantwortlicher FC Zuzw
   Alle Fixpunkte sind einzeln verschiebbar. ICT-Fachmann/-frau EFZ: nur Durchführungstag und Validierungsgespräch ca. eine Woche davor.
 - **SR-Kontingent:** Kein Spielzähler. Pro Vereins-SR und Kalenderjahr wird nur markiert, ob das Kontingent
   (15 Spiele) erreicht ist. Jeder erreichte SR sichert 2 Mannschaften für die folgende Saison.
-- **Projekte:** Statusampel (grün, gelb, rot), nächster Schritt, Meilensteine.
+- **Projekte:** Statusampel (grün, gelb, rot) und terminierte Meilensteine. Ein Meilenstein ist ein normaler Eintrag
+  (Typ "Projekt-Meilenstein", `project_id` gesetzt) und erscheint mit Vorlauf im Cockpit. Die Felder `next_step` und
+  `next_milestone` in `projects` werden nicht mehr verwendet.
 - **Outlook-Kalender:** Microsoft Graph, delegiert (nur eigener Kalender). Termine werden live geladen,
   über die Outlook-Kategorie einem Bereich zugeordnet (`calendar_categories`) und wie Einträge mit Vorlauf angezeigt.
   Nur lesend; Bearbeiten in Outlook. Code: `src/lib/outlook.ts`, `src/lib/events.ts`, `src/app/api/outlook/`.

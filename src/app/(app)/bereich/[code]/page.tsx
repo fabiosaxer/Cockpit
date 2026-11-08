@@ -22,7 +22,7 @@ export default async function AreaPage({
 }) {
   const { code } = await params;
   const { jahr } = await searchParams;
-  const { areas, types, items, projects, absences, today } = await loadCockpit();
+  const { areas, types, items, projects, absences, milestones, today } = await loadCockpit();
   const area = areas.find((a) => a.code.toLowerCase() === code.toLowerCase());
   if (!area) notFound();
 
@@ -39,6 +39,7 @@ export default async function AreaPage({
   const areaProjects = projects.filter((p) => p.area_id === area.id);
   const done = await loadDone(area.id);
   const typeName = (id: string | null) => types.find((t) => t.id === id)?.name;
+  const projectName = (id: string | null) => projects.find((p) => p.id === id)?.title;
 
   return (
     <div className="space-y-5">
@@ -69,7 +70,7 @@ export default async function AreaPage({
                 </div>
                 <ul className="divide-y divide-line/60">
                   {list.map((i) => (
-                    <ItemRow key={i.id} item={i} typeName={typeName(i.type_id)} back={back} />
+                    <ItemRow key={i.id} item={i} typeName={typeName(i.type_id)} projectName={projectName(i.project_id)} back={back} />
                   ))}
                 </ul>
               </div>
@@ -80,18 +81,19 @@ export default async function AreaPage({
         <aside className="space-y-3">
           <h2 className="label px-1">Projekte</h2>
           {areaProjects.map((p) => (
-            <ProjectCard key={p.id} project={p} today={today} />
+            <ProjectCard
+              key={p.id}
+              project={p}
+              milestones={milestones.filter((m) => m.project_id === p.id)}
+              today={today}
+              back={back}
+            />
           ))}
           <details className="instrument p-4 pt-3">
             <summary className="label cursor-pointer px-2 text-cyan">+ Projekt hinzufügen</summary>
             <form action={createProject} className="mt-3 space-y-3">
               <input type="hidden" name="area_id" value={area.id} />
               <input name="title" required placeholder="Projekttitel" className="field" />
-              <input name="next_step" placeholder="Nächster Schritt" className="field" />
-              <label className="block space-y-1">
-                <span className="label">Nächster Meilenstein</span>
-                <input type="date" name="next_milestone" className="field" />
-              </label>
               <SubmitButton className="btn btn-primary w-full">Anlegen</SubmitButton>
             </form>
           </details>

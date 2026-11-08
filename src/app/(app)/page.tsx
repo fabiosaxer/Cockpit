@@ -1,5 +1,6 @@
 import { AbsenceBanner } from "@/components/AbsenceBanner";
 import { AreaTile } from "@/components/AreaTile";
+import { ProjectSummary } from "@/components/ProjectCard";
 import { QuickAdd } from "@/components/QuickAdd";
 import { QuotaSummary } from "@/components/QuotaSection";
 import { StatusBar } from "@/components/StatusBar";
@@ -7,7 +8,7 @@ import { loadCockpit, loadOutlookItems } from "@/lib/data";
 import { classifyAll } from "@/lib/logic";
 
 export default async function CockpitPage() {
-  const { areas, types, items, projects, absences, today } = await loadCockpit();
+  const { areas, types, items, projects, absences, milestones, today } = await loadCockpit();
   const outlook = await loadOutlookItems(areas);
   const all = classifyAll([...items, ...outlook.items], types, today, absences);
   const count = (s: string) => all.filter((i) => i.state === s).length;
@@ -33,6 +34,24 @@ export default async function CockpitPage() {
           />
         ))}
       </div>
+      {projects.length > 0 && (
+        <section className="space-y-2">
+          <h2 className="label px-1">Projekte</h2>
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            {[...projects]
+              .sort((a, b) => ({ red: 0, amber: 1, green: 2 })[a.status] - ({ red: 0, amber: 1, green: 2 })[b.status])
+              .map((p) => (
+                <ProjectSummary
+                  key={p.id}
+                  project={p}
+                  milestones={milestones.filter((m) => m.project_id === p.id)}
+                  areaCode={areas.find((a) => a.id === p.area_id)?.code}
+                  today={today}
+                />
+              ))}
+          </div>
+        </section>
+      )}
       <QuickAdd areas={areas} types={types} projects={projects} today={today} />
     </div>
   );
