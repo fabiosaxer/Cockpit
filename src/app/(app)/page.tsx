@@ -4,6 +4,7 @@ import { ProjectSummary } from "@/components/ProjectCard";
 import { QuickAdd } from "@/components/QuickAdd";
 import { QuotaSummary } from "@/components/QuotaSection";
 import { StatusBar } from "@/components/StatusBar";
+import { Timeline } from "@/components/Timeline";
 import { loadCockpit, loadOutlookItems } from "@/lib/data";
 import { classifyAll } from "@/lib/logic";
 
@@ -15,7 +16,8 @@ export default async function CockpitPage() {
 
   return (
     <div className="space-y-4">
-      <StatusBar overdue={count("overdue")} today={count("today")} approach={count("approach")} />
+      <StatusBar overdue={count("overdue")} today={count("today")} />
+      <Timeline items={all} areas={areas} today={today} />
       <AbsenceBanner absences={absences} today={today} />
       {(outlook.status === "relogin" || outlook.status === "error") && (
         <a href="/einstellungen" className="instrument block px-4 py-3 text-sm font-semibold text-red">
