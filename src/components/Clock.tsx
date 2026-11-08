@@ -33,3 +33,26 @@ export function Clock() {
     </div>
   );
 }
+
+/** Begruessung nach Tageszeit, auf dem Geraet berechnet und minuetlich aktualisiert. */
+export function Greeting() {
+  const [hour, setHour] = useState<number | null>(null);
+  useEffect(() => {
+    const update = () =>
+      setHour(
+        Number(
+          new Intl.DateTimeFormat("de-CH", { hour: "numeric", hour12: false, timeZone: "Europe/Zurich" }).format(
+            new Date(),
+          ),
+        ),
+      );
+    update();
+    const t = setInterval(update, 60_000);
+    return () => clearInterval(t);
+  }, []);
+  if (hour === null) return <>Hallo</>;
+  if (hour < 5) return <>Gute Nacht</>;
+  if (hour < 11) return <>Guten Morgen</>;
+  if (hour < 17) return <>Hallo</>;
+  return <>Guten Abend</>;
+}

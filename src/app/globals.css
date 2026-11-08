@@ -67,6 +67,25 @@ body {
     color: var(--color-ink);
     font-size: 16px; /* verhindert Zoom auf iOS */
   }
+  /* Safari: Datumsfelder haben sonst eine Mindestbreite und ragen aus schmalen Spalten */
+  input[type="date"].field,
+  input[type="time"].field {
+    min-width: 0;
+    max-width: 100%;
+    display: block;
+    -webkit-appearance: none;
+    appearance: none;
+    min-height: 2.9rem;
+    text-align: left;
+  }
+  /* Grid-Spalten mit Datumsfeld duerfen schrumpfen */
+  label:has(> input[type="date"]),
+  label:has(> input[type="time"]) {
+    min-width: 0;
+  }
+  input[type="date"].field::-webkit-date-and-time-value {
+    text-align: left;
+  }
   .field:focus {
     outline: none;
     border-color: var(--color-cyan);

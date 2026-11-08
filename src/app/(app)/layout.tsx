@@ -1,20 +1,10 @@
 import Link from "next/link";
-import { Clock } from "@/components/Clock";
+import { Clock, Greeting } from "@/components/Clock";
 import { Logo } from "@/components/Logo";
 import { Nav } from "@/components/Nav";
 import { formatLong, todayISO } from "@/lib/dates";
 
 export const dynamic = "force-dynamic";
-
-function greeting(): string {
-  const hour = Number(
-    new Intl.DateTimeFormat("de-CH", { hour: "numeric", hour12: false, timeZone: "Europe/Zurich" }).format(new Date()),
-  );
-  if (hour < 5) return "Gute Nacht";
-  if (hour < 11) return "Guten Morgen";
-  if (hour < 17) return "Hallo";
-  return "Guten Abend";
-}
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -36,7 +26,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <Logo size={40} />
             </span>
             <div className="drop-shadow-[0_1px_2px_rgba(10,60,110,0.35)]">
-              <div className="text-xl leading-tight font-black">{greeting()}, Fabio</div>
+              <div className="text-xl leading-tight font-black">
+                <Greeting />, Fabio
+              </div>
               <div className="text-sm font-semibold opacity-90">{formatLong(todayISO())}</div>
             </div>
           </Link>
