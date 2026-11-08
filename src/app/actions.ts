@@ -342,12 +342,80 @@ export async function deleteReferee(id: string) {
 }
 
 /** Kontingent fuer ein Kalenderjahr als erreicht / nicht erreicht markieren. */
-export async function setRefereeQuota(refereeId: string, year: number, reached: boolean) {
+const QUOTA_STATUSES = ["open", "on_track", "paused", "reached"] as const;
+
+/** Status eines Vereins-SR fuer ein Kalenderjahr (zaehlt fuer die folgende Saison). */
+export async function setRefereeStatus(refereeId: string, year: number, status: string) {
+  if (!QUOTA_STATUSES.includes(status as (typeof QUOTA_STATUSES)[number])) return;
   const { supabase } = await requireSession();
   const { error } = await supabase
     .from("referee_quota")
-    .upsert({ referee_id: refereeId, year, reached }, { onConflict: "referee_id,year" });
+    .upsert({ referee_id: refereeId, year, status }, { onConflict: "referee_id,year" });
   if (error) throw new Error(error.message);
+  refresh();
+}
+
+/** Bemerkung, z.B. Grund fuer "Pausiert". */
+export async function setRefereeNote(refereeId: string, year: number, fd: FormData) {
+  const { supabase } = await requireSession();
+  const { error } = await supabase
+    .from("referee_quota")
+    .upsert({ referee_id: refereeId, year, note: optStr(fd, "note") }, { onConflict: "referee_id,year" });
+  if (error) throw new Error(error.message);
+  refresh();
+}
+
+/**
+ * Neuling markieren: Kurs im Winter/Fruehling, 5 Spiele, zaehlt fuer den Saisonstart.
+ * Nur fuer Personen, die in keinem frueheren Jahr als SR gefuehrt wurden.
+ */
+export async function setRefereeNewcomer(refereeId: string, year: number, newcomer: boolean) {
+  const { supabase } = await requireSession();
+  if (newcomer) {
+    const { data: prev } = await supabase
+      .from("referee_quota")
+      .select("id")
+      .eq("referee_id", refereeId)
+      .lt("year", year)
+      .neq("status", "open")
+      .limit(1);
+    if (prev?.length) throw new Error("War bereits Schiedsrichter und kann nicht als Neuling zählen.");
+  }
+  const { error } = await supabase
+    .from("referee_quota")
+    .upsert({ referee_id: refereeId, year, newcomer }, { onConflict: "referee_id,year" });
+  if (error) throw new Error(error.message);
+  refresh();
+}
+
+/** Ziel: Anzahl Mannschaften fuer die Saison, die auf dieses Kalenderjahr folgt. */
+export async function setSeasonTarget(year: number, fd: FormData) {
+  const { supabase } = await requireSession();
+  const teams = optInt(fd, "teams");
+  if (teams == null) {
+    await supabase.from("referee_season_target").delete().eq("year", year);
+  } else {
+    const { data: auth } = await supabase.auth.getUser();
+    const { error } = await supabase
+      .from("referee_season_target")
+      .upsert({ user_id: auth.user?.id, year, teams }, { onConflict: "user_id,year" });
+    if (error) throw new Error(error.message);
+  }
+  refresh();
+}
+
+/** Neuen SR direkt als Neuling fuer diese Saison anlegen. */
+export async function createNewcomer(year: number, fd: FormData) {
+  const { supabase } = await requireSession();
+  const name = str(fd, "name");
+  if (!name) return;
+  if (fd.get("never_before") !== "on") throw new Error("Nur für Personen, die vorher keine Schiedsrichter waren.");
+  const { data: ref, error } = await supabase.from("referees").insert({ name, kind: "verein" }).select("id").single();
+  if (error || !ref) throw new Error(error?.message ?? "Speichern fehlgeschlagen");
+  const { error: qErr } = await supabase
+    .from("referee_quota")
+    .insert({ referee_id: ref.id, year, newcomer: true, status: "open", note: optStr(fd, "note") });
+  if (qErr) throw new Error(qErr.message);
   refresh();
 }
 

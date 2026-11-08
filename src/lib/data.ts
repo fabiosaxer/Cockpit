@@ -103,15 +103,29 @@ export async function loadIpa(): Promise<{ candidates: IpaCandidate[]; points: I
   return { candidates: c.data as IpaCandidate[], points: p.data as Item[] };
 }
 
-export async function loadReferees(year: number): Promise<{ referees: Referee[]; quota: RefereeQuota[] }> {
+export async function loadReferees(year: number): Promise<{
+  referees: Referee[];
+  quota: RefereeQuota[];
+  target: number | null;
+  /** SR mit Eintraegen in frueheren Jahren: koennen keine Neulinge sein */
+  veterans: Set<string>;
+}> {
   const { supabase } = await requireSession();
-  const [r, q] = await Promise.all([
+  const [r, q, t, prev] = await Promise.all([
     supabase.from("referees").select("*").order("name"),
     supabase.from("referee_quota").select("*").eq("year", year),
+    supabase.from("referee_season_target").select("teams").eq("year", year).maybeSingle(),
+    supabase.from("referee_quota").select("referee_id").lt("year", year).neq("status", "open"),
   ]);
   if (r.error) throw new Error(r.error.message);
   if (q.error) throw new Error(q.error.message);
-  return { referees: r.data as Referee[], quota: q.data as RefereeQuota[] };
+  if (t.error) throw new Error(t.error.message);
+  return {
+    referees: r.data as Referee[],
+    quota: q.data as RefereeQuota[],
+    target: (t.data?.teams as number | undefined) ?? null,
+    veterans: new Set((prev.data ?? []).map((x) => x.referee_id as string)),
+  };
 }
 
 export async function loadDone(areaId: string, limit = 10): Promise<Item[]> {

@@ -46,8 +46,11 @@ Bühler, Studium (ZHAW SML), IPA (Prüfungsexperte), SR-Verantwortlicher FC Zuzw
 - **IPA:** Aus Kürzel, Start und Ende werden Fixpunkte erzeugt: Validierungsgespräch (ca. 2 Arbeitstage vor Start),
   Besuch 1 (2. Arbeitstag), Besuch 2 (Mitte), Abgabe (Ende), Korrektur, Präsentation (ca. 3 Wochen nach Abgabe).
   Alle Fixpunkte sind einzeln verschiebbar. ICT-Fachmann/-frau EFZ: nur Durchführungstag und Validierungsgespräch ca. eine Woche davor.
-- **SR-Kontingent:** Kein Spielzähler. Pro Vereins-SR und Kalenderjahr wird nur markiert, ob das Kontingent
-  (15 Spiele) erreicht ist. Jeder erreichte SR sichert 2 Mannschaften für die folgende Saison.
+- **SR-Kontingent:** Kein Spielzähler. Ansicht pro Saison; Kalenderjahr Y zählt für Saison Y+1/Y+2.
+  Status pro Vereins-SR und Jahr: Offen, Auf Kurs, Pausiert (mit Grund, zählt nicht), Erreicht. Jeder erreichte SR
+  sichert 2 Mannschaften. Ziel in Mannschaften pro Saison (`referee_season_target`), Bilanz in `quotaBalance`.
+  Neulinge (Kurs im Winter/Frühling, 5 Spiele im Frühling Y+1) zählen für dieselbe Saison, nur wenn die Person
+  in keinem früheren Jahr als SR geführt war. Bis Ende Juni zeigt die App standardmässig die anstehende Saison.
 - **Projekte:** Statusampel (grün, gelb, rot) und terminierte Meilensteine. Ein Meilenstein ist ein normaler Eintrag
   (Typ "Projekt-Meilenstein", `project_id` gesetzt) und erscheint mit Vorlauf im Cockpit. Die Felder `next_step` und
   `next_milestone` in `projects` werden nicht mehr verwendet.

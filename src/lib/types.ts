@@ -75,7 +75,9 @@ export type RefereeQuota = {
   id: string;
   referee_id: string;
   year: number;
-  reached: boolean;
+  status: "open" | "on_track" | "paused" | "reached";
+  note: string | null;
+  newcomer: boolean;
 };
 
 export type CalendarCategory = {

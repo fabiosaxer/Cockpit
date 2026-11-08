@@ -6,7 +6,7 @@ import { ProjectCard } from "@/components/ProjectCard";
 import { IpaSection } from "@/components/IpaSection";
 import { ModulesSection } from "@/components/ModulesSection";
 import { QuickAdd } from "@/components/QuickAdd";
-import { QuotaSection } from "@/components/QuotaSection";
+import { defaultQuotaYear, QuotaSection } from "@/components/QuotaSection";
 import { SubmitButton } from "@/components/SubmitButton";
 import { loadCockpit, loadDone, loadOutlookItems } from "@/lib/data";
 import { areaColor } from "@/lib/areaColors";
@@ -36,7 +36,7 @@ export default async function AreaPage({
     absences,
   );
   const currentYear = Number(today.slice(0, 4));
-  const year = Math.min(currentYear, Number(jahr) || currentYear);
+  const year = Math.min(currentYear, Number(jahr) || defaultQuotaYear(today));
   const areaProjects = projects.filter((p) => p.area_id === area.id);
   const done = await loadDone(area.id);
   const typeName = (id: string | null) => types.find((t) => t.id === id)?.name;
