@@ -58,3 +58,26 @@ export function Greeting() {
   if (hour < 17) return <>Hallo</>;
   return <>Guten Abend</>;
 }
+
+/** Nach 1 Uhr nachts ein dezenter Hinweis. */
+export function CrewRest() {
+  const [late, setLate] = useState(false);
+  useEffect(() => {
+    const check = () => {
+      const h = Number.parseInt(
+        new Intl.DateTimeFormat("en-GB", { hour: "2-digit", hourCycle: "h23", timeZone: "Europe/Zurich" }).format(new Date()),
+        10,
+      );
+      setLate(h >= 1 && h < 5);
+    };
+    check();
+    const t = setInterval(check, 60_000);
+    return () => clearInterval(t);
+  }, []);
+  if (!late) return null;
+  return (
+    <span className="mt-1 inline-block rounded-full bg-white/20 px-2 py-0.5 text-xs font-bold text-white backdrop-blur">
+      Crew Rest empfohlen
+    </span>
+  );
+}

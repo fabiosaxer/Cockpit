@@ -117,3 +117,22 @@ export function nextDueDate(
   }
   return next;
 }
+
+/**
+ * Tage ohne Ueberfaelliges ("unfallfrei").
+ * Gezaehlt wird ab dem letzten Tag, an dem etwas verspaetet erledigt wurde, oder ab dem ersten Eintrag.
+ * Ist jetzt etwas ueberfaellig, ist der Zaehler 0.
+ */
+export function overdueFreeDays(
+  done: { due_date: string; done_date: string }[],
+  overdueNow: boolean,
+  today: string,
+  firstDay: string | null,
+): number {
+  if (overdueNow) return 0;
+  let last = firstDay;
+  for (const d of done) {
+    if (d.done_date > d.due_date && (!last || d.done_date > last)) last = d.done_date;
+  }
+  return last ? Math.max(0, diffDays(today, last)) : 0;
+}

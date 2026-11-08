@@ -159,3 +159,21 @@ export async function loadOutlookItems(areas: Area[]): Promise<{ status: Outlook
     return { status: e instanceof OutlookAuthError ? "relogin" : "error", items: [] };
   }
 }
+
+/** Grundlage fuer den Unfallfrei-Zaehler: erledigte Eintraege des letzten Jahres und der erste Eintrag. */
+export async function loadOverdueHistory(): Promise<{
+  done: { due_date: string; done_date: string }[];
+  firstDay: string | null;
+}> {
+  const { supabase } = await requireSession();
+  const since = addDays(todayISO(), -400);
+  const [done, first] = await Promise.all([
+    supabase.from("items").select("due_date, done_at").not("done_at", "is", null).gte("due_date", since),
+    supabase.from("items").select("created_at").order("created_at").limit(1),
+  ]);
+  const toDay = (ts: string) => todayISO(new Date(ts));
+  return {
+    done: (done.data ?? []).map((d) => ({ due_date: d.due_date as string, done_date: toDay(d.done_at as string) })),
+    firstDay: first.data?.[0] ? toDay(first.data[0].created_at as string) : null,
+  };
+}

@@ -27,14 +27,10 @@ html {
 body {
   color: var(--color-ink);
   font-family: var(--font-sans);
+  /* Himmel kommt aus der Sky-Komponente (Tageszeit); Fallback fuer die Login-Seite */
   background-color: #f6fbff;
-  background-image:
-    url("/sky/clouds.svg"),
-    linear-gradient(180deg, #3fa9f2 0px, #7cc6f8 180px, #c4e6fd 380px, #eef7ff 620px, #f6fbff 900px);
+  background-image: linear-gradient(180deg, #3fa9f2 0px, #7cc6f8 180px, #c4e6fd 380px, #eef7ff 620px, #f6fbff 900px);
   background-repeat: no-repeat;
-  background-size: 1400px auto, 100% 100%;
-  background-position: top center, top left;
-  background-attachment: scroll;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -170,9 +166,98 @@ body {
   transform-origin: center;
 }
 
+/* ---------- Easter Eggs ---------- */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 0.25; }
+}
+.twinkle { animation: twinkle 3.2s ease-in-out infinite; }
+
+@keyframes strobe {
+  0%, 88%, 100% { opacity: 0; }
+  90%, 94% { opacity: 1; }
+}
+.strobe { animation: strobe 1.4s linear infinite; }
+@keyframes strobe-slow {
+  0%, 60%, 100% { opacity: 0.2; }
+  65%, 75% { opacity: 1; }
+}
+.strobe-slow { animation: strobe-slow 2s linear infinite; }
+
+@keyframes snow {
+  0% { transform: translate(0, -10px); }
+  50% { transform: translate(14px, 50vh); }
+  100% { transform: translate(-6px, 105vh); }
+}
+.snow { animation: snow 12s linear infinite; }
+
+@keyframes firework {
+  0% { --burst: 0px; opacity: 0; }
+  10% { opacity: 1; }
+  70% { --burst: 46px; opacity: 1; }
+  100% { --burst: 56px; opacity: 0; }
+}
+@property --burst {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+.firework { animation: firework 2.4s ease-out infinite; }
+
+@keyframes drift {
+  0% { transform: translate(-12vw, 10px); }
+  50% { transform: translate(45vw, -6px); }
+  100% { transform: translate(105vw, 10px); }
+}
+.drift { animation: drift 120s linear infinite; }
+
+@keyframes wobble {
+  0%, 100% { margin-top: 0; rotate: 0deg; }
+  50% { margin-top: 14px; rotate: 8deg; }
+}
+.wobble > * { animation: wobble 3s ease-in-out infinite; }
+
+/* Adler: gleitet langsam in sanften Wellen, schlaegt ab und zu mit den Fluegeln */
+@keyframes soar {
+  0% { transform: translate(-12vw, 16px); }
+  25% { transform: translate(20vw, -4px); }
+  50% { transform: translate(48vw, 12px); }
+  75% { transform: translate(76vw, -8px); }
+  100% { transform: translate(110vw, 10px); }
+}
+.soar { animation: soar 55s linear infinite; }
+@keyframes flap {
+  0%, 70%, 100% { transform: scaleY(1); }
+  76% { transform: scaleY(-0.55); }
+  82% { transform: scaleY(1); }
+  88% { transform: scaleY(-0.55); }
+  94% { transform: scaleY(1); }
+}
+.eagle-wings { transform-origin: 60px 24px; transform-box: view-box; animation: flap 7s ease-in-out infinite; }
+
+/* Looping: Arm dreht, das Flugzeug sitzt oben am Kreis */
+@keyframes loop {
+  0% { transform: translateX(-40vw) rotate(0deg); }
+  25% { transform: translateX(0) rotate(0deg); }
+  75% { transform: translateX(0) rotate(-360deg); }
+  100% { transform: translateX(40vw) rotate(-360deg); }
+}
+.loop-arm { animation: loop 3.6s ease-in-out forwards; }
+.loop-arm svg { transform: scaleX(-1) scale(1.4); }
+
 @media (prefers-reduced-motion: reduce) {
   .plane,
-  .blink {
+  .blink,
+  .twinkle,
+  .snow,
+  .firework,
+  .drift,
+  .soar,
+  .eagle-wings,
+  .loop-arm,
+  .wobble > *,
+  .strobe,
+  .strobe-slow {
     animation: none;
   }
 }

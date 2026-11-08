@@ -59,6 +59,15 @@ Bühler, Studium (ZHAW SML), IPA (Prüfungsexperte), SR-Verantwortlicher FC Zuzw
   über die Outlook-Kategorie einem Bereich zugeordnet (`calendar_categories`) und wie Einträge mit Vorlauf angezeigt.
   Pro Kategorie `in_timeline` (aus = nicht im Zeitstrahl, z.B. Lektionen). Nur lesend; Bearbeiten in Outlook. Code: `src/lib/outlook.ts`, `src/lib/events.ts`, `src/app/api/outlook/`.
 
+## Easter Eggs
+
+- Himmel folgt Sonnenauf-/-untergang in Zuzwil (`src/lib/sun.ts`, `src/components/Sky.tsx`): Morgenrot, Tag, Golden Hour, Dämmerung, Nacht mit Sternen und Mond.
+- Seltene Flieger (Steinadler, Ballon, Segler, Doppeldecker mit Banner, Papierflieger), nachts Positionslichter, ab 1 Uhr „Crew Rest empfohlen“.
+- Logo antippen: künstlicher Horizont folgt der Geräteneigung (`LiveLogo`).
+- Heute-Liste komplett erledigt: Looping (`CelebrateWatcher` -> Event `cockpit:celebrate`).
+- 1. August rot-weisser Kondensstreifen, Dezember Schnee, Silvester Feuerwerk, Geburtstag (`BIRTHDAY`=MM-DD in Vercel) Banner.
+- Unfallfrei-Zähler: Tage ohne Überfälliges (`overdueFreeDays`).
+
 ## Daten- und Sicherheitsregeln
 
 - Keine Firmeninhalte von Bühler: nur Projekttitel, Status und Termine.
