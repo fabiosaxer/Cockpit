@@ -136,3 +136,20 @@ export function overdueFreeDays(
   }
   return last ? Math.max(0, diffDays(today, last)) : 0;
 }
+
+/**
+ * Heute-Liste: bewusst eingeplante Eintraege plus alle Aufgaben, die heute faellig oder ueberfaellig sind.
+ * Termine (Outlook und Typ "Termin") gehoeren nicht dazu, sie stehen im Zeitstrahl.
+ */
+export function todayTasks<T extends Item>(items: T[], types: ItemType[], today: string): T[] {
+  const appointmentType = types.find((t) => t.name === "Termin")?.id;
+  return items
+    .filter(
+      (i) =>
+        !i.done_at &&
+        !i.event &&
+        ((i.planned_for != null && i.planned_for <= today) ||
+          (i.due_date <= today && (appointmentType == null || i.type_id !== appointmentType))),
+    )
+    .sort((a, b) => a.due_date.localeCompare(b.due_date) || a.title.localeCompare(b.title));
+}

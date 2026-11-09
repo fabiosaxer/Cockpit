@@ -8,7 +8,7 @@ import { StatusBar } from "@/components/StatusBar";
 import { Timeline } from "@/components/Timeline";
 import { TodayList } from "@/components/TodayList";
 import { loadCockpit, loadOutlookItems, loadOverdueHistory } from "@/lib/data";
-import { classifyAll, overdueFreeDays } from "@/lib/logic";
+import { classifyAll, overdueFreeDays, todayTasks } from "@/lib/logic";
 
 export default async function CockpitPage() {
   const { areas, types, items, projects, absences, milestones, modules, today } = await loadCockpit();
@@ -24,8 +24,8 @@ export default async function CockpitPage() {
         today={count("today")}
         streak={overdueFreeDays(history.done, items.some((i) => i.due_date < today), today, history.firstDay)}
       />
-      <CelebrateWatcher open={items.filter((i) => i.planned_for && i.planned_for <= today).length} />
-      <TodayList items={all} areas={areas} today={today} />
+      <CelebrateWatcher open={todayTasks(items, types, today).length} />
+      <TodayList items={all} types={types} areas={areas} today={today} />
       <Timeline items={all} areas={areas} today={today} />
       <AbsenceBanner absences={absences} today={today} />
       {(outlook.status === "relogin" || outlook.status === "error") && (
