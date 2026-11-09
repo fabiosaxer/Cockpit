@@ -81,3 +81,31 @@ export function CrewRest() {
     </span>
   );
 }
+
+/** Kleine Wetteranzeige neben der Uhr (Daten kommen von der Sky-Komponente). */
+export function WeatherBadge() {
+  const [w, setW] = useState<{ kind: string; temp: number; place: string } | null>(null);
+  useEffect(() => {
+    const on = (e: Event) => setW((e as CustomEvent).detail);
+    window.addEventListener("cockpit:weather", on);
+    return () => window.removeEventListener("cockpit:weather", on);
+  }, []);
+  if (!w) return null;
+  const icon: Record<string, string> = {
+    clear: "☀️",
+    partly: "🌤️",
+    overcast: "☁️",
+    fog: "🌫️",
+    rain: "🌧️",
+    snow: "🌨️",
+    thunder: "⛈️",
+  };
+  return (
+    <div
+      className="text-right font-mono text-xs leading-tight font-bold text-white drop-shadow-[0_1px_1px_rgba(10,60,110,0.4)]"
+      title={w.place === "default" ? "Wetter in Zuzwil" : "Wetter am Standort"}
+    >
+      <span aria-hidden="true">{icon[w.kind] ?? ""}</span> {w.temp}°
+    </div>
+  );
+}

@@ -245,6 +245,29 @@ body {
 .loop-arm { animation: loop 3.6s ease-in-out forwards; }
 .loop-arm svg { transform: scaleX(-1) scale(1.4); }
 
+/* Wetter */
+@keyframes rain {
+  0% { transform: translate(0, -20px) rotate(12deg); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: translate(-60px, 105vh) rotate(12deg); opacity: 0.6; }
+}
+.rain { animation: rain 0.7s linear infinite; }
+
+@keyframes lightning {
+  0%, 92%, 100% { opacity: 0; }
+  93% { opacity: 0.55; }
+  94% { opacity: 0.05; }
+  95.5% { opacity: 0.4; }
+  97% { opacity: 0; }
+}
+.lightning { animation: lightning 9s linear infinite; }
+
+@keyframes fog-drift {
+  0%, 100% { transform: translateX(-2%); }
+  50% { transform: translateX(2%); }
+}
+.fog { animation: fog-drift 30s ease-in-out infinite; }
+
 @media (prefers-reduced-motion: reduce) {
   .plane,
   .blink,
@@ -257,7 +280,10 @@ body {
   .loop-arm,
   .wobble > *,
   .strobe,
-  .strobe-slow {
+  .strobe-slow,
+  .rain,
+  .lightning,
+  .fog {
     animation: none;
   }
 }

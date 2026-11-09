@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { skyPhase, type SkyPhase } from "@/lib/sun";
+import { skyPhase, ZUZWIL, type SkyPhase } from "@/lib/sun";
+import { loadWeather, readCachedWeather, type Weather, type WeatherKind } from "@/lib/weather";
 
 /* ---------- Himmel je Tageszeit ---------- */
 
@@ -12,6 +13,26 @@ const GRADIENTS: Record<SkyPhase, string> = {
   dusk: "linear-gradient(180deg, #34357e 0px, #7a52a3 170px, #e2878f 360px, #efe2ea 640px, #f6f4f8 900px)",
   night: "linear-gradient(180deg, #07122b 0px, #11265a 200px, #27467f 420px, #c3d0e4 760px, #eef2f8 1000px)",
 };
+
+/* ---------- Wetter ---------- */
+
+/** Grauschleier ueber dem Tageszeit-Himmel, je nach Wetterlage */
+const VEIL: Record<WeatherKind, number> = {
+  clear: 0,
+  partly: 0,
+  overcast: 0.75,
+  fog: 0.7,
+  rain: 0.85,
+  snow: 0.65,
+  thunder: 0.9,
+};
+
+const RAIN = Array.from({ length: 70 }, (_, i) => ({
+  left: (i * 53) % 100,
+  delay: ((i * 37) % 100) / 100,
+  duration: 0.55 + ((i * 17) % 30) / 100,
+  height: 14 + (i % 4) * 4,
+}));
 
 type Special = { swiss: boolean; snow: boolean; fireworks: boolean; birthday: boolean };
 type Craft = "jet" | "eagle" | "balloon" | "glider" | "biplane" | "paper";
@@ -145,6 +166,8 @@ export function Sky({ birthday }: { birthday?: string }) {
   const [now, setNow] = useState<Date | null>(null);
   const [craft, setCraft] = useState<Craft>("jet");
   const [celebrate, setCelebrate] = useState(false);
+  const [weather, setWeather] = useState<Weather | null>(null);
+  const [forcedWeather, setForcedWeather] = useState<WeatherKind | null>(null);
 
   useEffect(() => {
     const d = new Date();
@@ -162,24 +185,43 @@ export function Sky({ birthday }: { birthday?: string }) {
       setTimeout(() => setCelebrate(false), 3800);
     };
     window.addEventListener("cockpit:celebrate", onCelebrate);
+
+    setForcedWeather(new URLSearchParams(window.location.search).get("wetter") as WeatherKind | null);
+
+    // Wetter am Standort, alle 30 Minuten aktualisiert
+    const updateWeather = async () => {
+      const w = readCachedWeather() ?? (await loadWeather());
+      if (w) {
+        setWeather(w);
+        window.dispatchEvent(new CustomEvent("cockpit:weather", { detail: w }));
+      }
+    };
+    updateWeather();
+    const tw = setInterval(updateWeather, 10 * 60_000);
+
     return () => {
       clearInterval(t);
+      clearInterval(tw);
       window.removeEventListener("cockpit:celebrate", onCelebrate);
     };
   }, [birthday]);
 
-  const phase: SkyPhase = now ? skyPhase(now) : "day";
+  const phase: SkyPhase = now ? skyPhase(now, weather?.lat ?? ZUZWIL.lat, weather?.lng ?? ZUZWIL.lng) : "day";
+  // Versteckt: ?wetter=rain usw. zum Ausprobieren
+  const kind: WeatherKind = forcedWeather && forcedWeather in VEIL ? forcedWeather : (weather?.kind ?? "clear");
+  const veil = VEIL[kind];
+  const cloudy = kind !== "clear";
   const special: Special = useMemo(() => {
     if (!now) return { swiss: false, snow: false, fireworks: false, birthday: false };
     const { month, day, hour, minute } = zurichParts(now);
     const md = `${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
     return {
       swiss: md === "08-01",
-      snow: month === 12,
+      snow: month === 12 || kind === "snow",
       fireworks: (md === "12-31" && hour * 60 + minute >= 23 * 60 + 30) || (md === "01-01" && hour < 1),
       birthday: !!birthday && md === birthday,
     };
-  }, [now, birthday]);
+  }, [now, birthday, kind]);
 
   const night = phase === "night";
   const dark = night || phase === "dusk";
@@ -190,14 +232,66 @@ export function Sky({ birthday }: { birthday?: string }) {
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
       <div className="absolute inset-0 transition-[background] duration-[3000ms]" style={{ background: GRADIENTS[phase] }} />
 
-      {/* Wolken, nachts nur angedeutet */}
+      {/* Grauschleier bei schlechtem Wetter */}
+      {veil > 0 && (
+        <div
+          className="absolute inset-0 transition-opacity duration-[3000ms]"
+          style={{
+            opacity: veil,
+            background: dark
+              ? "linear-gradient(180deg, #1c2430 0px, #2c3644 420px, rgba(60,70,84,0.4) 900px)"
+              : "linear-gradient(180deg, #8794a3 0px, #a8b3bf 300px, rgba(205,212,220,0.6) 700px, rgba(230,234,238,0.3) 1000px)",
+          }}
+        />
+      )}
+
+      {/* Wolken, nachts nur angedeutet; bei Bewoelkung dichter und grauer */}
       <div
         className="absolute inset-x-0 top-0 h-[420px] bg-[url('/sky/clouds.svg')] bg-[length:1400px_auto] bg-top bg-no-repeat"
-        style={{ opacity: night ? 0.12 : dark ? 0.35 : 1 }}
+        style={{
+          opacity: night ? (cloudy ? 0.25 : 0.12) : dark ? 0.35 : 1,
+          filter: veil > 0 ? `brightness(${1 - veil * 0.35})` : undefined,
+        }}
       />
+      {cloudy && kind !== "fog" && (
+        <div
+          className="absolute inset-x-0 top-6 h-[420px] bg-[url('/sky/clouds.svg')] bg-[length:620px_auto] bg-repeat-x"
+          style={{
+            backgroundPosition: "-120px 0",
+            opacity: night ? 0.15 : kind === "partly" ? 0.6 : 0.95,
+            filter: veil > 0 ? `brightness(${1 - veil * 0.4})` : undefined,
+            transform: "scaleX(-1)",
+          }}
+        />
+      )}
 
-      {/* Sterne und Mond */}
-      {dark && (
+      {/* Nebel */}
+      {kind === "fog" && (
+        <div
+          className="fog absolute inset-0"
+          style={{ background: "linear-gradient(180deg, rgba(232,236,240,0.55) 0%, rgba(236,239,242,0.92) 40%, rgba(240,242,245,0.75) 100%)" }}
+        />
+      )}
+
+      {/* Regen und Gewitter */}
+      {(kind === "rain" || kind === "thunder") &&
+        RAIN.map((r, i) => (
+          <span
+            key={i}
+            className="rain absolute -top-6 w-px"
+            style={{
+              left: `${r.left}%`,
+              height: r.height,
+              animationDelay: `${r.delay}s`,
+              animationDuration: `${r.duration}s`,
+              background: dark ? "rgba(190,205,225,0.55)" : "rgba(80,105,135,0.45)",
+            }}
+          />
+        ))}
+      {kind === "thunder" && <div className="lightning absolute inset-0 bg-white" />}
+
+      {/* Sterne und Mond (nicht bei dichter Bewoelkung) */}
+      {dark && veil < 0.4 && (
         <div className="absolute inset-0" style={{ opacity: night ? 1 : 0.5 }}>
           {STARS.map((s, i) => (
             <span

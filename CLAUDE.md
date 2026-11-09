@@ -68,6 +68,9 @@ Bühler, Studium (ZHAW SML), IPA (Prüfungsexperte), SR-Verantwortlicher FC Zuzw
 ## Easter Eggs
 
 - Himmel folgt Sonnenauf-/-untergang in Zuzwil (`src/lib/sun.ts`, `src/components/Sky.tsx`): Morgenrot, Tag, Golden Hour, Dämmerung, Nacht mit Sternen und Mond.
+- Wetter am Standort (Open-Meteo, ohne Schlüssel; Geolocation auf ~1 km gerundet, sonst Zuzwil; Cache 30 Min.,
+  `src/lib/weather.ts`): Bewölkung, Nebel, Regen, Schnee, Gewitter mit Blitzen; Temperatur neben der Uhr.
+  Zum Testen `?wetter=rain` (clear, partly, overcast, fog, rain, snow, thunder).
 - Seltene Flieger (Steinadler, Ballon, Segler, Doppeldecker mit Banner, Papierflieger), nachts Positionslichter, ab 1 Uhr „Crew Rest empfohlen“.
 - Logo antippen: künstlicher Horizont folgt der Geräteneigung (`LiveLogo`).
 - Heute-Liste komplett erledigt: Looping (`CelebrateWatcher` -> Event `cockpit:celebrate`).

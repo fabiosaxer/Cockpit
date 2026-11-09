@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Clock, CrewRest, Greeting } from "@/components/Clock";
+import { Clock, CrewRest, Greeting, WeatherBadge } from "@/components/Clock";
 import { LiveLogo } from "@/components/LiveLogo";
 import { Sky } from "@/components/Sky";
 import { Nav } from "@/components/Nav";
@@ -28,7 +28,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <div className="hidden sm:block">
               <Nav />
             </div>
-            <Clock />
+            <div className="space-y-0.5">
+              <Clock />
+              <WeatherBadge />
+            </div>
           </div>
         </header>
         <main>{children}</main>
