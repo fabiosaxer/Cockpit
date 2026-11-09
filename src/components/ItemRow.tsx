@@ -91,15 +91,20 @@ export function ItemRow({
           </div>
         )}
       </Link>
+      {/* Sonne: bei Terminen vorbereiten, bei Aufgaben nur zum Vorziehen (nicht wenn heute faellig oder ueberfaellig) */}
       {item.state !== "done" &&
         (isAppointment ? (
-          <form action={prepareEvent.bind(null, item.title, item.area_id, item.due_date)}>
-            <PlanButton active={false} label={`${item.title} vorbereiten`} />
-          </form>
-        ) : (
+          item.days >= 0 && (
+            <form action={prepareEvent.bind(null, item.title, item.area_id, item.due_date)}>
+              <PlanButton active={false} label={`${item.title} vorbereiten`} />
+            </form>
+          )
+        ) : item.days > 0 ? (
           <form action={setPlannedToday.bind(null, item.id, !planned)}>
             <PlanButton active={planned} label={item.title} />
           </form>
+        ) : (
+          <span className="size-7 shrink-0" aria-hidden="true" />
         ))}
       <span className={`chip shrink-0 tabular-nums ${s.pill}`}>{countdown(item.days)}</span>
     </li>

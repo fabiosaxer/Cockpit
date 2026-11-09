@@ -57,6 +57,7 @@ Bühler, Studium (ZHAW SML), IPA (Prüfungsexperte), SR-Verantwortlicher FC Zuzw
 - **Studium:** Fächer in `study_modules` (pro Semester, archivierbar). Einträge im Bereich ZHAW haben optional `module_id`.
 - **Heute-Liste:** `todayTasks` = eingeplante (`items.planned_for`, Sonnen-Knopf) plus heute fällige und überfällige
   Aufgaben, ohne Termine (Outlook, Typ "Termin"); Termine stehen im Zeitstrahl. Hervorgehoben zuoberst.
+  Sonnen-Knopf nur zum Vorziehen künftiger Aufgaben oder zum Vorbereiten von Terminen, nicht bei heute Fälligem.
   Nicht erledigte Einträge bleiben auf der Liste. Bei Terminen (Outlook und Typ "Termin") entsteht stattdessen eine Aufgabe „Vorbereiten: …“.
 - **Kritische Termine:** `items.deadline` = echte Frist, `due_date` = Frist minus 7 Tage (`CRITICAL_BUFFER_DAYS`).
 - **Outlook-Kalender:** Microsoft Graph, delegiert, nur `Calendars.Read` (nur eigener Kalender, nie schreiben). Termine werden live geladen,
