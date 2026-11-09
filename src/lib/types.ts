@@ -29,6 +29,8 @@ export type Item = {
   deadline?: string | null;
   /** Auf die Heute-Liste gesetzt fuer diesen Tag */
   planned_for?: string | null;
+  /** Eigene Reihenfolge in der Heute-Liste */
+  today_order?: number | null;
   lead_days: number | null;
   note: string | null;
   recur_every: number | null;

@@ -8,7 +8,7 @@ Next.js 15 · Supabase · Vercel. Kontext für Claude Code steht in `CLAUDE.md`.
 
 ### 1. Supabase
 1. **SQL Editor** → die Dateien in `supabase/migrations/` der Reihe nach einfügen und ausführen (Run):
-   `20261107000000_init.sql`, `20261108000000_absences_ipa_referees.sql`, `20261108010000_ipa_profession_quota_toggle.sql`, `20261108020000_outlook.sql`, `20261108030000_item_deadline.sql`, `20261108040000_study_modules.sql`, `20261108050000_category_timeline.sql`, `20261108060000_planned_today.sql`, `20261108070000_quota_status.sql`.
+   `20261107000000_init.sql`, `20261108000000_absences_ipa_referees.sql`, `20261108010000_ipa_profession_quota_toggle.sql`, `20261108020000_outlook.sql`, `20261108030000_item_deadline.sql`, `20261108040000_study_modules.sql`, `20261108050000_category_timeline.sql`, `20261108060000_planned_today.sql`, `20261108070000_quota_status.sql`, `20261109000000_today_order.sql`.
 2. **Authentication → URL Configuration**
    - Site URL: `https://cockpit.saxer.sg`
    - Redirect URLs: `https://cockpit.saxer.sg/**`, `https://*.vercel.app/**`, `http://localhost:3000/**`

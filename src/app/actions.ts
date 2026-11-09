@@ -523,3 +523,15 @@ export async function prepareEvent(title: string, areaId: string, eventDate: str
   if (error) throw new Error(error.message);
   refresh();
 }
+
+/** Reihenfolge der Heute-Liste speichern (ids von oben nach unten). */
+export async function reorderToday(ids: string[]) {
+  const { supabase } = await requireSession();
+  const valid = ids.filter((id) => /^[0-9a-f-]{36}$/i.test(id)).slice(0, 200);
+  const results = await Promise.all(
+    valid.map((id, index) => supabase.from("items").update({ today_order: index }).eq("id", id)),
+  );
+  const failed = results.find((r) => r.error);
+  if (failed?.error) throw new Error(failed.error.message);
+  refresh();
+}

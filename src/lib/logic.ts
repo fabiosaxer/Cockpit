@@ -151,5 +151,11 @@ export function todayTasks<T extends Item>(items: T[], types: ItemType[], today:
         ((i.planned_for != null && i.planned_for <= today) ||
           (i.due_date <= today && (appointmentType == null || i.type_id !== appointmentType))),
     )
-    .sort((a, b) => a.due_date.localeCompare(b.due_date) || a.title.localeCompare(b.title));
+    .sort(
+      (a, b) =>
+        // eigene Reihenfolge zuerst, neue Eintraege (ohne Reihenfolge) danach nach Faelligkeit
+        (a.today_order ?? Number.MAX_SAFE_INTEGER) - (b.today_order ?? Number.MAX_SAFE_INTEGER) ||
+        a.due_date.localeCompare(b.due_date) ||
+        a.title.localeCompare(b.title),
+    );
 }
