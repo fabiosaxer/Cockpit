@@ -100,6 +100,7 @@ export function TodaySortable({
   today: string;
 }) {
   const [rows, setRows] = useState(items);
+  const [error, setError] = useState<string | null>(null);
   const [, startTransition] = useTransition();
 
   // neue Daten vom Server uebernehmen (z.B. nach Erledigt)
@@ -115,9 +116,21 @@ export function TodaySortable({
     if (!over || active.id === over.id) return;
     const from = rows.findIndex((r) => r.id === active.id);
     const to = rows.findIndex((r) => r.id === over.id);
+    const before = rows;
     const next = arrayMove(rows, from, to);
     setRows(next);
-    startTransition(() => reorderToday(next.map((r) => r.id)));
+    setError(null);
+    startTransition(async () => {
+      const res = await reorderToday(next.map((r) => r.id));
+      if (!res.ok) {
+        setRows(before);
+        setError(
+          res.error?.includes("today_order")
+            ? "Reihenfolge nicht gespeichert: Die Datenbank-Migration für die Sortierung fehlt noch."
+            : "Reihenfolge konnte nicht gespeichert werden.",
+        );
+      }
+    });
   }
 
   return (
@@ -134,6 +147,7 @@ export function TodaySortable({
           ))}
         </ul>
       </SortableContext>
+      {error && <p className="px-4 pb-3 text-xs font-semibold text-red">{error}</p>}
     </DndContext>
   );
 }
