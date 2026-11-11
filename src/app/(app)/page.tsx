@@ -38,7 +38,7 @@ export default async function CockpitPage() {
           <AreaTile
             key={area.id}
             area={area}
-            items={all.filter((i) => i.area_id === area.id)}
+            items={all.filter((i) => i.area_id === area.id && !i.event)}
             projects={projects.filter((p) => p.area_id === area.id)}
             types={types}
             modules={modules}

@@ -8,7 +8,7 @@ import { ModulesSection } from "@/components/ModulesSection";
 import { QuickAdd } from "@/components/QuickAdd";
 import { defaultQuotaYear, QuotaSection } from "@/components/QuotaSection";
 import { SubmitButton } from "@/components/SubmitButton";
-import { loadCockpit, loadDone, loadOutlookItems } from "@/lib/data";
+import { loadCockpit, loadDone } from "@/lib/data";
 import { areaColor } from "@/lib/areaColors";
 import { classifyAll, type ItemState } from "@/lib/logic";
 
@@ -28,9 +28,8 @@ export default async function AreaPage({
   if (!area) notFound();
 
   const back = `/bereich/${area.code}`;
-  const outlook = await loadOutlookItems(areas);
   const all = classifyAll(
-    [...items, ...outlook.items].filter((i) => i.area_id === area.id),
+    items.filter((i) => i.area_id === area.id),
     types,
     today,
     absences,

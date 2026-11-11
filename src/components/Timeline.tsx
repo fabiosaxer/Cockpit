@@ -1,13 +1,15 @@
 import Link from "next/link";
+import { prepareEvent } from "@/app/actions";
 import { areaColor } from "@/lib/areaColors";
 import { addDays, weekday } from "@/lib/dates";
 import type { ClassifiedItem } from "@/lib/logic";
 import type { Area } from "@/lib/types";
+import { PlanButton } from "./PlanButton";
 
 const DAYS = 14;
 const WEEKDAYS = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
 
-function Pill({ item, code }: { item: ClassifiedItem; code: string }) {
+function Pill({ item, code, prepared }: { item: ClassifiedItem; code: string; prepared?: boolean }) {
   const color = areaColor(code);
   const content = (
     <span
@@ -20,12 +22,23 @@ function Pill({ item, code }: { item: ClassifiedItem; code: string }) {
     </span>
   );
   if (item.event) {
-    return item.event.webLink ? (
-      <a href={item.event.webLink} target="_blank" rel="noreferrer" title={item.title}>
-        {content}
-      </a>
-    ) : (
-      content
+    return (
+      <div className="relative">
+        {item.event.webLink ? (
+          <a href={item.event.webLink} target="_blank" rel="noreferrer" title={item.title} className="block pr-5">
+            {content}
+          </a>
+        ) : (
+          <div className="pr-5">{content}</div>
+        )}
+        {/* Vorbereitungsaufgabe fuer heute anlegen */}
+        <form
+          action={prepareEvent.bind(null, item.title, item.area_id, item.due_date)}
+          className="absolute top-0.5 -right-1 scale-75"
+        >
+          <PlanButton active={!!prepared} label={`${item.title} vorbereiten`} />
+        </form>
+      </div>
     );
   }
   return (
@@ -38,6 +51,10 @@ function Pill({ item, code }: { item: ClassifiedItem; code: string }) {
 /** Zeitstrahl ueber die naechsten 14 Tage, alle Bereiche gemeinsam, unabhaengig vom Vorlauf. */
 export function Timeline({ items: allItems, areas, today }: { items: ClassifiedItem[]; areas: Area[]; today: string }) {
   const items = allItems.filter((i) => !i.event?.quiet);
+  // Termine, fuer die schon eine offene Vorbereitungsaufgabe existiert
+  const prepared = new Set(
+    allItems.filter((i) => !i.event && !i.done_at && i.title.startsWith("Vorbereiten: ")).map((i) => i.title.slice(13)),
+  );
   const code = (areaId: string) => areas.find((a) => a.id === areaId)?.code ?? "";
   const end = addDays(today, DAYS - 1);
   const overdue = items.filter((i) => i.state === "overdue");
@@ -65,7 +82,7 @@ export function Timeline({ items: allItems, areas, today }: { items: ClassifiedI
             </div>
             <div className="space-y-1">
               {overdue.map((i) => (
-                <Pill key={i.id} item={i} code={code(i.area_id)} />
+                <Pill key={i.id} item={i} code={code(i.area_id)} prepared={!!i.event && prepared.has(i.title)} />
               ))}
             </div>
           </div>
@@ -91,7 +108,7 @@ export function Timeline({ items: allItems, areas, today }: { items: ClassifiedI
               </div>
               <div className="space-y-1">
                 {list.map((i) => (
-                  <Pill key={i.id} item={i} code={code(i.area_id)} />
+                  <Pill key={i.id} item={i} code={code(i.area_id)} prepared={!!i.event && prepared.has(i.title)} />
                 ))}
               </div>
             </div>
