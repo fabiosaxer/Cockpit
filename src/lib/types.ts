@@ -97,3 +97,11 @@ export type StudyModule = {
   semester: string | null;
   sort: number;
 };
+
+export type AbsenceItem = {
+  id: string;
+  absence_id: string;
+  title: string;
+  checked: boolean;
+  created_at: string;
+};

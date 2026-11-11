@@ -2,7 +2,7 @@ import "server-only";
 import { redirect } from "next/navigation";
 import { createClient } from "./supabase/server";
 import { addDays, todayISO } from "./dates";
-import type { Absence, Area, IpaCandidate, Item, ItemType, Project, Referee, RefereeQuota, CalendarCategory, StudyModule } from "./types";
+import type { Absence, AbsenceItem, Area, IpaCandidate, Item, ItemType, Project, Referee, RefereeQuota, CalendarCategory, StudyModule } from "./types";
 
 const DEFAULT_AREAS = [
   { code: "BUE", name: "Bühler", sort: 10 },
@@ -190,4 +190,44 @@ export async function loadOverdueHistory(): Promise<{
     done: (done.data ?? []).map((d) => ({ due_date: d.due_date as string, done_date: toDay(d.done_at as string) })),
     firstDay: first.data?.[0] ? toDay(first.data[0].created_at as string) : null,
   };
+}
+
+/** Eine Abwesenheit mit Mitnehmen-Liste und frueheren Abwesenheiten (zum Uebernehmen ihrer Liste). */
+export async function loadAbsence(id: string): Promise<{
+  absence: Absence;
+  items: AbsenceItem[];
+  previous: (Absence & { count: number })[];
+} | null> {
+  const { supabase } = await requireSession();
+  const { data: absence } = await supabase.from("absences").select("*").eq("id", id).maybeSingle();
+  if (!absence) return null;
+  const [items, others, counts] = await Promise.all([
+    supabase.from("absence_items").select("*").eq("absence_id", id).order("created_at"),
+    supabase.from("absences").select("*").neq("id", id).order("start_date", { ascending: false }).limit(20),
+    supabase.from("absence_items").select("absence_id"),
+  ]);
+  const countBy = new Map<string, number>();
+  for (const r of counts.data ?? []) countBy.set(r.absence_id, (countBy.get(r.absence_id) ?? 0) + 1);
+  return {
+    absence: absence as Absence,
+    items: (items.data ?? []) as AbsenceItem[],
+    previous: ((others.data ?? []) as Absence[])
+      .map((a) => ({ ...a, count: countBy.get(a.id) ?? 0 }))
+      .filter((a) => a.count > 0),
+  };
+}
+
+/** Packstand pro Abwesenheit: eingepackt / total. Leer, falls die Tabelle noch fehlt. */
+export async function loadPackCounts(ids: string[]): Promise<Record<string, { done: number; total: number }>> {
+  if (!ids.length) return {};
+  const { supabase } = await requireSession();
+  const { data, error } = await supabase.from("absence_items").select("absence_id, checked").in("absence_id", ids);
+  if (error) return {};
+  const out: Record<string, { done: number; total: number }> = {};
+  for (const r of data ?? []) {
+    const c = (out[r.absence_id] ??= { done: 0, total: 0 });
+    c.total++;
+    if (r.checked) c.done++;
+  }
+  return out;
 }

@@ -544,3 +544,61 @@ export async function reorderToday(ids: string[]): Promise<{ ok: boolean; error?
     return { ok: false, error: e instanceof Error ? e.message : "Unbekannter Fehler" };
   }
 }
+
+// ---------- Mitnehmen-Liste ----------
+
+/** Neue Punkte; mehrere auf einmal mit Komma oder Zeilenumbruch getrennt. */
+export async function addPackItems(absenceId: string, fd: FormData) {
+  const { supabase } = await requireSession();
+  const titles = str(fd, "title")
+    .split(/[,\n]/)
+    .map((t) => t.trim())
+    .filter(Boolean)
+    .slice(0, 50);
+  if (!titles.length) return;
+  const { error } = await supabase
+    .from("absence_items")
+    .insert(titles.map((title) => ({ absence_id: absenceId, title })));
+  if (error) throw new Error(error.message);
+  refresh();
+}
+
+export async function togglePackItem(id: string, checked: boolean) {
+  const { supabase } = await requireSession();
+  const { error } = await supabase.from("absence_items").update({ checked }).eq("id", id);
+  if (error) throw new Error(error.message);
+  refresh();
+}
+
+export async function deletePackItem(id: string) {
+  const { supabase } = await requireSession();
+  const { error } = await supabase.from("absence_items").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+  refresh();
+}
+
+/** Liste einer frueheren Abwesenheit uebernehmen (nicht abgehakt, ohne Doppelte). */
+export async function copyPackList(fromId: string, toId: string) {
+  const { supabase } = await requireSession();
+  const [{ data: source }, { data: existing }] = await Promise.all([
+    supabase.from("absence_items").select("title").eq("absence_id", fromId).order("created_at"),
+    supabase.from("absence_items").select("title").eq("absence_id", toId),
+  ]);
+  const have = new Set((existing ?? []).map((r) => r.title.toLowerCase()));
+  const rows = (source ?? [])
+    .filter((r) => !have.has(r.title.toLowerCase()))
+    .map((r) => ({ absence_id: toId, title: r.title }));
+  if (rows.length) {
+    const { error } = await supabase.from("absence_items").insert(rows);
+    if (error) throw new Error(error.message);
+  }
+  refresh();
+}
+
+/** Alle Haekchen entfernen (z.B. fuer die Rueckreise). */
+export async function resetPackList(absenceId: string) {
+  const { supabase } = await requireSession();
+  const { error } = await supabase.from("absence_items").update({ checked: false }).eq("absence_id", absenceId);
+  if (error) throw new Error(error.message);
+  refresh();
+}

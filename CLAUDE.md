@@ -42,7 +42,8 @@ Bühler, Studium (ZHAW SML), IPA (Prüfungsexperte), SR-Verantwortlicher FC Zuzw
 - **Wiederholung:** Nur im Haushalt (HOME) ab dem Erledigt-Datum. Sonst fixer Rhythmus ab der bisherigen Fälligkeit
   (`nextDueDate` in `logic.ts`); Monatsende bleibt Monatsende.
 - **Abwesenheiten:** Wiederkehrende Aufgaben in einer Abwesenheit werden auf den ersten Tag danach verschoben.
-  Fixe Fristen werden nicht verschoben, sondern markiert.
+  Fixe Fristen werden nicht verschoben, sondern markiert. Pro Abwesenheit eine Mitnehmen-Checkliste
+  (`absence_items`, Detailseite `/abwesenheiten/[id]`), übernehmbar von früheren Reisen; Packstand im Banner.
 - **IPA:** Aus Kürzel, Start und Ende werden Fixpunkte erzeugt: Validierungsgespräch (ca. 2 Arbeitstage vor Start),
   Besuch 1 (2. Arbeitstag), Besuch 2 (Mitte), Abgabe (Ende), Korrektur, Präsentation (ca. 3 Wochen nach Abgabe).
   Alle Fixpunkte sind einzeln verschiebbar. ICT-Fachmann/-frau EFZ: nur Durchführungstag und Validierungsgespräch ca. eine Woche davor.

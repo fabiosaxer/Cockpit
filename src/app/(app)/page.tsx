@@ -7,12 +7,16 @@ import { QuotaSummary } from "@/components/QuotaSection";
 import { StatusBar } from "@/components/StatusBar";
 import { Timeline } from "@/components/Timeline";
 import { TodayList } from "@/components/TodayList";
-import { loadCockpit, loadOutlookItems, loadOverdueHistory } from "@/lib/data";
+import { loadCockpit, loadOutlookItems, loadOverdueHistory, loadPackCounts } from "@/lib/data";
 import { classifyAll, overdueFreeDays, todayTasks } from "@/lib/logic";
 
 export default async function CockpitPage() {
   const { areas, types, items, projects, absences, milestones, modules, today } = await loadCockpit();
-  const [outlook, history] = await Promise.all([loadOutlookItems(areas), loadOverdueHistory()]);
+  const [outlook, history, packs] = await Promise.all([
+    loadOutlookItems(areas),
+    loadOverdueHistory(),
+    loadPackCounts(absences.filter((a) => a.end_date >= today).map((a) => a.id)),
+  ]);
   const all = classifyAll([...items, ...outlook.items], types, today, absences);
   // Ruhige Termine (z.B. Lektionen) zaehlen nicht in der Lagezeile
   const count = (s: string) => all.filter((i) => i.state === s && !i.event?.quiet).length;
@@ -27,7 +31,7 @@ export default async function CockpitPage() {
       <CelebrateWatcher open={todayTasks(items, types, today).length} />
       <TodayList items={all} types={types} areas={areas} today={today} />
       <Timeline items={all} areas={areas} today={today} />
-      <AbsenceBanner absences={absences} today={today} />
+      <AbsenceBanner absences={absences} today={today} packs={packs} />
       {(outlook.status === "relogin" || outlook.status === "error") && (
         <a href="/einstellungen" className="instrument block px-4 py-3 text-sm font-semibold text-red">
           Outlook-Termine konnten nicht geladen werden. Zu den Einstellungen ›
