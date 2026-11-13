@@ -1,7 +1,9 @@
 import "server-only";
 import { redirect } from "next/navigation";
+import { cache } from "react";
 import { createClient } from "./supabase/server";
 import { addDays, todayISO } from "./dates";
+import { eventsToItems } from "./events";
 import type { Absence, AbsenceItem, Area, IpaCandidate, Item, ItemType, Project, Referee, RefereeQuota, CalendarCategory, StudyModule } from "./types";
 
 const DEFAULT_AREAS = [
@@ -22,11 +24,17 @@ const DEFAULT_TYPES = [
   { name: "IPA-Korrektur", lead_days: 21, sort: 60 },
 ];
 
-export async function requireSession() {
+/** Pro Anfrage nur einmal: Supabase-Client und Login-Pruefung (spart Hin- und Rueckwege zum Auth-Server). */
+const getSession = cache(async () => {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  return { supabase, user };
+});
+
+export async function requireSession() {
+  const { supabase, user } = await getSession();
   if (!user) redirect("/login");
   return { supabase, user };
 }
@@ -43,16 +51,18 @@ export type Cockpit = {
   today: string;
 };
 
-/** Laedt alle offenen Daten. Beim ersten Login werden Bereiche und Typen angelegt. */
-export async function loadCockpit(): Promise<Cockpit> {
+/** Laedt alle offenen Daten (einmal pro Anfrage). Beim ersten Login werden Bereiche und Typen angelegt. */
+export const loadCockpit = cache(async (): Promise<Cockpit> => {
+  const first = await loadCockpitOnce();
+  if (first.areas.length) return first;
   const { supabase } = await requireSession();
+  await supabase.from("areas").insert(DEFAULT_AREAS);
+  await supabase.from("item_types").insert(DEFAULT_TYPES);
+  return loadCockpitOnce();
+});
 
-  const { count } = await supabase.from("areas").select("id", { count: "exact", head: true });
-  if (!count) {
-    await supabase.from("areas").insert(DEFAULT_AREAS);
-    await supabase.from("item_types").insert(DEFAULT_TYPES);
-  }
-
+async function loadCockpitOnce(): Promise<Cockpit> {
+  const { supabase } = await requireSession();
   const today = todayISO();
   const [areas, types, items, projects, absences, milestones, modules] = await Promise.all([
     supabase.from("areas").select("*").order("sort"),
@@ -149,29 +159,45 @@ export async function loadItem(id: string): Promise<Item | null> {
 
 export type OutlookStatus = "off" | "disconnected" | "ok" | "relogin" | "error";
 
-/** Outlook-Termine als Eintraege. Fehler fuehren nie zum Absturz der Seite. */
-export async function loadOutlookItems(areas: Area[]): Promise<{ status: OutlookStatus; items: Item[] }> {
+/** Outlook-Rohdaten (Termine + Kategorien), unabhaengig von den Bereichen und daher parallel ladbar. */
+export async function loadOutlookRaw(): Promise<{
+  status: OutlookStatus;
+  events: import("./outlook").OutlookEvent[];
+  categories: CalendarCategory[];
+}> {
   const { outlookConfigured, getAccessToken, fetchEvents, OutlookAuthError } = await import("./outlook");
-  const { eventsToItems } = await import("./events");
-  if (!outlookConfigured()) return { status: "off", items: [] };
+  if (!outlookConfigured()) return { status: "off", events: [], categories: [] };
   const { supabase } = await requireSession();
   try {
-    const token = await getAccessToken(supabase);
-    if (!token) return { status: "disconnected", items: [] };
     const today = todayISO();
-    const [events, cats] = await Promise.all([
-      fetchEvents(token, today, addDays(today, 90)),
+    const [token, cats] = await Promise.all([
+      getAccessToken(supabase),
       supabase.from("calendar_categories").select("*"),
     ]);
-    const items = eventsToItems(events, (cats.data ?? []) as CalendarCategory[], areas).map((i) =>
-      // Mehrtaegige Termine, die vor heute begonnen haben, laufen heute noch
-      i.due_date < today ? { ...i, due_date: today } : i,
-    );
-    return { status: "ok", items };
+    if (!token) return { status: "disconnected", events: [], categories: [] };
+    const events = await fetchEvents(token, today, addDays(today, 90));
+    return { status: "ok", events, categories: (cats.data ?? []) as CalendarCategory[] };
   } catch (e) {
     console.error("Outlook:", e);
-    return { status: e instanceof OutlookAuthError ? "relogin" : "error", items: [] };
+    return { status: e instanceof OutlookAuthError ? "relogin" : "error", events: [], categories: [] };
   }
+}
+
+/** Outlook-Termine als Eintraege. Fehler fuehren nie zum Absturz der Seite. */
+export async function loadOutlookItems(areas: Area[]): Promise<{ status: OutlookStatus; items: Item[] }> {
+  return outlookToItems(await loadOutlookRaw(), areas);
+}
+
+export function outlookToItems(
+  raw: Awaited<ReturnType<typeof loadOutlookRaw>>,
+  areas: Area[],
+): { status: OutlookStatus; items: Item[] } {
+  const today = todayISO();
+  const items = eventsToItems(raw.events, raw.categories, areas).map((i) =>
+    // Mehrtaegige Termine, die vor heute begonnen haben, laufen heute noch
+    i.due_date < today ? { ...i, due_date: today } : i,
+  );
+  return { status: raw.status, items };
 }
 
 /** Grundlage fuer den Unfallfrei-Zaehler: erledigte Eintraege des letzten Jahres und der erste Eintrag. */
@@ -222,6 +248,23 @@ export async function loadPackCounts(ids: string[]): Promise<Record<string, { do
   if (!ids.length) return {};
   const { supabase } = await requireSession();
   const { data, error } = await supabase.from("absence_items").select("absence_id, checked").in("absence_id", ids);
+  if (error) return {};
+  const out: Record<string, { done: number; total: number }> = {};
+  for (const r of data ?? []) {
+    const c = (out[r.absence_id] ??= { done: 0, total: 0 });
+    c.total++;
+    if (r.checked) c.done++;
+  }
+  return out;
+}
+
+/** Packstand aller kommenden/laufenden Abwesenheiten in einer Abfrage. */
+export async function loadUpcomingPackCounts(): Promise<Record<string, { done: number; total: number }>> {
+  const { supabase } = await requireSession();
+  const { data, error } = await supabase
+    .from("absence_items")
+    .select("absence_id, checked, absences!inner(end_date)")
+    .gte("absences.end_date", todayISO());
   if (error) return {};
   const out: Record<string, { done: number; total: number }> = {};
   for (const r of data ?? []) {

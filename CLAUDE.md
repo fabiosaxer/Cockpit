@@ -79,6 +79,14 @@ Bühler, Studium (ZHAW SML), IPA (Prüfungsexperte), SR-Verantwortlicher FC Zuzw
 - 1. August rot-weisser Kondensstreifen, Dezember Schnee, Silvester Feuerwerk, Geburtstag (`BIRTHDAY`=MM-DD in Vercel) Banner.
 - Unfallfrei-Zähler: Tage ohne Überfälliges (`overdueFreeDays`).
 
+## Performance
+
+- Vercel-Funktionen in `fra1` (Frankfurt, `vercel.json`), nahe an Supabase (eu-central-1).
+- `requireSession` und `loadCockpit` sind mit React `cache()` pro Anfrage nur einmal aktiv.
+- Übersicht lädt alles parallel (`Promise.all`); Outlook-Rohdaten unabhängig von Bereichen (`loadOutlookRaw`).
+- Graph-Termine 5 Minuten im Server-Cache (`graphGet(..., 300)`).
+- Schriften via Fontsource (selbst gehostet), `loading.tsx` als Skelett beim Navigieren.
+
 ## Daten- und Sicherheitsregeln
 
 - Keine Firmeninhalte von Bühler: nur Projekttitel, Status und Termine.

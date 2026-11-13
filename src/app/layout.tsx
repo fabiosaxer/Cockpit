@@ -1,4 +1,12 @@
 import type { Metadata, Viewport } from "next";
+// Schriften sind Teil der App (Fontsource) und kommen von der eigenen Domain, ohne Aufruf bei Google
+import "@fontsource/nunito/latin-400.css";
+import "@fontsource/nunito/latin-600.css";
+import "@fontsource/nunito/latin-700.css";
+import "@fontsource/nunito/latin-800.css";
+import "@fontsource/nunito/latin-900.css";
+import "@fontsource/b612-mono/latin-400.css";
+import "@fontsource/b612-mono/latin-700.css";
 import "./globals.css";
 
 export const metadata: Metadata = {

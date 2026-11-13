@@ -7,16 +7,20 @@ import { QuotaSummary } from "@/components/QuotaSection";
 import { StatusBar } from "@/components/StatusBar";
 import { Timeline } from "@/components/Timeline";
 import { TodayList } from "@/components/TodayList";
-import { loadCockpit, loadOutlookItems, loadOverdueHistory, loadPackCounts } from "@/lib/data";
+import { Suspense } from "react";
+import { loadCockpit, loadOutlookRaw, loadOverdueHistory, loadUpcomingPackCounts, outlookToItems } from "@/lib/data";
 import { classifyAll, overdueFreeDays, todayTasks } from "@/lib/logic";
 
 export default async function CockpitPage() {
-  const { areas, types, items, projects, absences, milestones, modules, today } = await loadCockpit();
-  const [outlook, history, packs] = await Promise.all([
-    loadOutlookItems(areas),
+  // Alles gleichzeitig laden statt nacheinander
+  const [cockpit, outlookRaw, history, packs] = await Promise.all([
+    loadCockpit(),
+    loadOutlookRaw(),
     loadOverdueHistory(),
-    loadPackCounts(absences.filter((a) => a.end_date >= today).map((a) => a.id)),
+    loadUpcomingPackCounts(),
   ]);
+  const { areas, types, items, projects, absences, milestones, modules, today } = cockpit;
+  const outlook = outlookToItems(outlookRaw, areas);
   const all = classifyAll([...items, ...outlook.items], types, today, absences);
   // Ruhige Termine (z.B. Lektionen) zaehlen nicht in der Lagezeile
   const count = (s: string) => all.filter((i) => i.state === s && !i.event?.quiet).length;
@@ -46,7 +50,13 @@ export default async function CockpitPage() {
             projects={projects.filter((p) => p.area_id === area.id)}
             types={types}
             modules={modules}
-            extra={area.code === "FCZ" ? <QuotaSummary today={today} /> : undefined}
+            extra={
+              area.code === "FCZ" ? (
+                <Suspense fallback={null}>
+                  <QuotaSummary today={today} />
+                </Suspense>
+              ) : undefined
+            }
           />
         ))}
       </div>

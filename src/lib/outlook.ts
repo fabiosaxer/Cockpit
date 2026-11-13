@@ -84,10 +84,11 @@ export async function getAccessToken(supabase: Supabase): Promise<string | null>
   return t.access_token;
 }
 
-export async function graphGet<T>(token: string, path: string): Promise<T> {
+/** revalidate in Sekunden: Antwort so lange im Server-Cache halten (nur serverseitig, pro Token). */
+export async function graphGet<T>(token: string, path: string, revalidate?: number): Promise<T> {
   const res = await fetch(path.startsWith("http") ? path : `${GRAPH}${path}`, {
     headers: { Authorization: `Bearer ${token}`, Prefer: 'outlook.timezone="Europe/Zurich"' },
-    cache: "no-store",
+    ...(revalidate ? { next: { revalidate } } : { cache: "no-store" as const }),
   });
   if (res.status === 401) throw new OutlookAuthError("Graph 401");
   if (!res.ok) throw new Error(`Graph ${res.status}: ${(await res.text()).slice(0, 200)}`);
@@ -113,7 +114,8 @@ export async function fetchEvents(token: string, from: string, to: string): Prom
     `&$select=${select}&$orderby=start/dateTime&$top=250`;
   const events: OutlookEvent[] = [];
   for (let page = 0; url && page < 6; page++) {
-    const data: { value: OutlookEvent[]; "@odata.nextLink"?: string } = await graphGet(token, url);
+    // Termine 5 Minuten zwischenspeichern: Abhaken und Navigieren muessen nicht jedes Mal Microsoft fragen
+    const data: { value: OutlookEvent[]; "@odata.nextLink"?: string } = await graphGet(token, url, 300);
     events.push(...data.value);
     url = data["@odata.nextLink"] ?? null;
   }
